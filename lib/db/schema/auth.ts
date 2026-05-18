@@ -1,5 +1,11 @@
+// Originally bootstrapped via `@better-auth/cli generate`. Now hand-maintained
+// as the source of truth — keep Better Auth's `additionalFields` config in
+// lib/auth/index.ts in sync with any new columns added here.
+
 import { relations } from "drizzle-orm";
-import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+export const userRoleEnum = pgEnum("user_role", ["user", "master"]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -7,6 +13,7 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  role: userRoleEnum("role").default("user").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

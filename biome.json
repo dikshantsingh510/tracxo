@@ -62,5 +62,28 @@
       "indentWidth": 2,
       "trailingCommas": "none"
     }
-  }
+  },
+  "overrides": [
+    {
+      "include": ["components/ui/**"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noLabelWithoutControl": "off",
+            "useKeyWithClickEvents": "off"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
+          },
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noArrayIndexKey": "off"
+          },
+          "nursery": {
+            "useSortedClasses": "off"
+          }
+        }
+      }
+    }
+  ]
 }

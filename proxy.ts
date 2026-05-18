@@ -22,7 +22,7 @@ const PUBLIC_PREFIXES = [
 // Better Auth default session cookie name. Update if better-auth config overrides it.
 const SESSION_COOKIE = "better-auth.session_token";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (PUBLIC_PATHS.has(pathname) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
@@ -33,7 +33,7 @@ export function middleware(req: NextRequest) {
 
   // (app) and (master) require a session. Master role is re-verified in the
   // (master) layout via withMasterAuth — cookie alone cannot prove role.
-  // See docs/PROMPT.md §15.4: middleware is not the trust boundary, server
+  // See docs/PROMPT.md §15.4: proxy is not the trust boundary, server
   // actions and route guards re-check.
   if (!session) {
     const loginUrl = new URL("/login", req.url);

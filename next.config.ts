@@ -4,9 +4,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   reactCompiler: true,
   images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
-    ],
+    remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
   },
 };
 

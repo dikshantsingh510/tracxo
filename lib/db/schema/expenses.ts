@@ -1,6 +1,7 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
+  check,
   date,
   index,
   integer,
@@ -62,6 +63,7 @@ export const expenses = pgTable(
     index("expenses_expense_date_idx").on(t.expenseDate),
     index("expenses_deleted_at_idx").on(t.deletedAt),
     index("expenses_workspace_date_idx").on(t.workspaceId, t.expenseDate),
+    check("expenses_amount_positive", sql`${t.amount} > 0`),
   ],
 );
 
@@ -85,6 +87,7 @@ export const expenseSplits = pgTable(
     uniqueIndex("expense_splits_expense_user_unique").on(t.expenseId, t.userId),
     index("expense_splits_expense_id_idx").on(t.expenseId),
     index("expense_splits_user_id_idx").on(t.userId),
+    check("expense_splits_share_non_negative", sql`${t.shareAmount} >= 0`),
   ],
 );
 

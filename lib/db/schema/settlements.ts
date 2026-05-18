@@ -1,5 +1,14 @@
-import { relations } from "drizzle-orm";
-import { bigint, index, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+import {
+  bigint,
+  check,
+  index,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { user } from "./auth";
 import { workspaces } from "./workspaces";
 
@@ -42,6 +51,8 @@ export const settlements = pgTable(
     index("settlements_to_user_id_idx").on(t.toUserId),
     index("settlements_settled_at_idx").on(t.settledAt),
     index("settlements_workspace_settled_idx").on(t.workspaceId, t.settledAt),
+    check("settlements_amount_positive", sql`${t.amount} > 0`),
+    check("settlements_no_self_pay", sql`${t.fromUserId} <> ${t.toUserId}`),
   ],
 );
 

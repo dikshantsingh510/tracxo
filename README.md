@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tracxo
 
-## Getting Started
+> Splitwise, but actually fast — with one-tap UPI settlement.
 
-First, run the development server:
+A real-time shared-expense tracker for flatmates, friends, and travel groups. Frosted-glass UI, keyboard-first, built on the latest Next.js + React.
+
+**Status:** v0.1.0 — scaffold + auth groundwork. Not yet production-ready.
+
+---
+
+## Stack
+
+Pinned versions. Do not bump without coordination.
+
+| Layer       | Tech                                                                 |
+| ----------- | -------------------------------------------------------------------- |
+| Runtime     | Node.js 20+, pnpm                                                    |
+| Framework   | Next.js 16.2.6 (App Router, Turbopack, React Compiler) + React 19.2  |
+| Styling     | Tailwind v4 + shadcn/ui primitives                                   |
+| State       | TanStack Query/Table, nuqs (URL state), zustand (client state)       |
+| Forms       | react-hook-form + Zod                                                |
+| DB / ORM    | Drizzle ORM + `@neondatabase/serverless` (Neon HTTP driver)          |
+| Auth        | Better Auth (email/password + Google OAuth + OTP)                    |
+| Email       | Resend + `@react-email/components`                                   |
+| Money math  | dinero.js (amounts stored as `bigint` minor units)                   |
+| Lint/format | Biome (no ESLint, no Prettier)                                       |
+
+---
+
+## Prerequisites
+
+- Node.js 20+
+- pnpm 9+ (this repo is pnpm-only — `npm` and `yarn` will not work)
+- A Neon Postgres database (free tier fine)
+- A Resend account (for transactional email)
+
+---
+
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local      # fill in DATABASE_URL, auth secrets, Resend key
+pnpm dev                        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+See `.env.example` for the full list of required environment variables.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+```bash
+pnpm dev          # Next.js dev server (Turbopack)
+pnpm build        # production build
+pnpm start        # production server
+pnpm lint         # biome check .
+pnpm lint:fix     # biome check --write .
+pnpm format       # biome format --write .
+pnpm typecheck    # tsc --noEmit
+```
 
-To learn more about Next.js, take a look at the following resources:
+Database, test, and e2e scripts will land as those layers are wired up.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project layout
 
-## Deploy on Vercel
+```
+app/
+  (marketing)/    public landing — / , /privacy, /terms
+  (auth)/         login, signup, OTP, password reset
+  (app)/          authenticated app shell (gated by proxy.ts)
+  (master)/       internal admin panel (role-gated)
+  api/            route handlers (auth callbacks, SSE, cron)
+components/
+  expense, settlement, workspace, master, marketing, ui, providers
+lib/
+  actions/        Server Actions ('use server')
+  auth/           Better Auth config + helpers
+  db/             Drizzle schema + client
+  queries/        cached reads (unstable_cache + tags)
+  validation/     Zod schemas
+emails/           Resend templates
+tests/            unit + e2e
+proxy.ts          Next 16 edge proxy (session-cookie gate)
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Conventions
+
+- **Server Components by default.** Add `'use client'` only when needed.
+- **No `useEffect` for data fetching.** Use Server Components, Server Actions, or TanStack Query.
+- **Money is `bigint` in minor units** (paise/cents). Never `number`.
+- **IDs are UUID v7** via `crypto.randomUUID()`.
+- **Migrations:** `pnpm db:generate` (never hand-edit SQL). Two-step renames. Never `DROP TABLE` without explicit approval.
+- **Branching:** work on `feat/*`, `fix/*`, `chore/*` branches and open a PR to `main`. Direct pushes to `main` are reserved for emergencies.
+
+---
+
+## Docs
+
+Full project spec (`PROMPT.md`, `PRODUCT.md`, `DESIGN.md`, `tracxo-reference.pdf`) lives in `docs/` — **local only, not committed**. Ask the maintainer for the latest copy.
+
+---
+
+## License
+
+Private — all rights reserved.

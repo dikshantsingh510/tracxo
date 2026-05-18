@@ -7,7 +7,14 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "ignore": [".next", "node_modules", "next-env.d.ts", "pnpm-lock.yaml", "**/*.generated.*"]
+    "ignore": [
+      ".next",
+      "node_modules",
+      "next-env.d.ts",
+      "pnpm-lock.yaml",
+      "**/*.generated.*",
+      "lib/db/migrations/**"
+    ]
   },
   "organizeImports": {
     "enabled": true

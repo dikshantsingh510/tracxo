@@ -9,9 +9,9 @@ export const activityLog = pgTable(
     id: text("id")
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    workspaceId: text("workspace_id").references(() => workspaces.id, {
-      onDelete: "cascade",
-    }),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
     actorId: text("actor_id").references(() => user.id, {
       onDelete: "set null",
     }),

@@ -4,6 +4,7 @@ import { user } from "./auth";
 
 export const workspaceTypeEnum = pgEnum("workspace_type", ["personal", "team"]);
 export const workspaceRoleEnum = pgEnum("workspace_role", ["owner", "admin", "member"]);
+export const workspaceStatusEnum = pgEnum("workspace_status", ["active", "archived"]);
 
 export const workspaces = pgTable(
   "workspaces",
@@ -15,6 +16,7 @@ export const workspaces = pgTable(
     icon: varchar("icon", { length: 64 }),
     defaultCurrency: varchar("default_currency", { length: 3 }).notNull().default("INR"),
     type: workspaceTypeEnum("type").notNull().default("team"),
+    status: workspaceStatusEnum("status").notNull().default("active"),
     ownerId: text("owner_id")
       .notNull()
       .references(() => user.id, { onDelete: "restrict" }),
@@ -23,10 +25,12 @@ export const workspaces = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    archivedAt: timestamp("archived_at"),
     deletedAt: timestamp("deleted_at"),
   },
   (t) => [
     index("workspaces_owner_id_idx").on(t.ownerId),
+    index("workspaces_status_idx").on(t.status),
     index("workspaces_deleted_at_idx").on(t.deletedAt),
   ],
 );

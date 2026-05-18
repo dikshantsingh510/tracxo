@@ -15,6 +15,13 @@
       "when": 1779128066717,
       "tag": "0001_special_raza",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779129401928,
+      "tag": "0002_perfect_rictor",
+      "breakpoints": true
     }
   ]
 }

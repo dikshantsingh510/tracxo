@@ -2,6 +2,17 @@ import { db } from "@/lib/db/client";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { emailOTP } from "better-auth/plugins";
+
+// TODO(PR #15 — feat/notifications): replace this stub with Resend +
+// react-email templates. The Better Auth contracts (sendVerificationOTP,
+// sendResetPassword) stay the same — only the body of the lambda changes.
+async function sendAuthEmail(
+  channel: "otp" | "reset",
+  payload: { email: string; otp?: string; resetUrl?: string; type?: string },
+): Promise<void> {
+  console.log(`[auth-email/${channel}] ${JSON.stringify(payload)}`);
+}
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -13,6 +24,9 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     minPasswordLength: 8,
     maxPasswordLength: 128,
+    sendResetPassword: async ({ user, url }) => {
+      await sendAuthEmail("reset", { email: user.email, resetUrl: url });
+    },
   },
   user: {
     additionalFields: {
@@ -58,9 +72,24 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: "tracxo",
   },
-  // `nextCookies` must be the last plugin — it flushes Set-Cookie headers from
-  // Server Action invocations of `auth.api.*`.
-  plugins: [nextCookies()],
+  // Plugin order matters: `nextCookies` MUST be last — it flushes Set-Cookie
+  // headers from Server Action invocations of `auth.api.*`. emailOTP comes
+  // first so its routes register before the next-cookies after-hook runs.
+  plugins: [
+    emailOTP({
+      otpLength: 6,
+      // PRODUCT.md A1: 10-minute expiry.
+      expiresIn: 60 * 10,
+      sendVerificationOnSignUp: true,
+      // Use OTP instead of magic-link for email verification.
+      overrideDefaultEmailVerification: true,
+      allowedAttempts: 3,
+      sendVerificationOTP: async ({ email, otp, type }) => {
+        await sendAuthEmail("otp", { email, otp, type });
+      },
+    }),
+    nextCookies(),
+  ],
 });
 
 export type Auth = typeof auth;

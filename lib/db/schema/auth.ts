@@ -3,9 +3,10 @@
 // lib/auth/index.ts in sync with any new columns added here.
 
 import { relations } from "drizzle-orm";
-import { boolean, index, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("user_role", ["user", "master"]);
+export const currencyCodeEnum = pgEnum("currency_code", ["INR", "USD", "EUR", "GBP", "AUD", "SGD"]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -14,6 +15,9 @@ export const user = pgTable("user", {
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
   role: userRoleEnum("role").default("user").notNull(),
+  defaultCurrency: currencyCodeEnum("default_currency").default("INR").notNull(),
+  upiVpa: varchar("upi_vpa", { length: 255 }),
+  timezone: varchar("timezone", { length: 64 }).default("Asia/Kolkata").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

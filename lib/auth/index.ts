@@ -21,6 +21,23 @@ export const auth = betterAuth({
         defaultValue: "user",
         input: false,
       },
+      defaultCurrency: {
+        type: "string",
+        required: false,
+        defaultValue: "INR",
+        input: true,
+      },
+      upiVpa: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      timezone: {
+        type: "string",
+        required: false,
+        defaultValue: "Asia/Kolkata",
+        input: true,
+      },
     },
   },
   socialProviders:

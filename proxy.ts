@@ -1,3 +1,4 @@
+import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_PATHS = new Set([
@@ -19,9 +20,6 @@ const PUBLIC_PREFIXES = [
   "/static/",
 ];
 
-// Better Auth default session cookie name. Update if better-auth config overrides it.
-const SESSION_COOKIE = "better-auth.session_token";
-
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -29,13 +27,14 @@ export function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = req.cookies.get(SESSION_COOKIE);
+  // `getSessionCookie` handles cookiePrefix + __Secure- prefix automatically,
+  // so this stays in sync with lib/auth/index.ts without hardcoding. Note:
+  // presence-check only — server actions / route guards re-verify via
+  // `withAuth` since the cookie is signed but not validated here.
+  // See PROMPT.md §15.4: proxy is not the trust boundary.
+  const sessionCookie = getSessionCookie(req, { cookiePrefix: "tracxo" });
 
-  // (app) and (master) require a session. Master role is re-verified in the
-  // (master) layout via withMasterAuth — cookie alone cannot prove role.
-  // See docs/PROMPT.md §15.4: proxy is not the trust boundary, server
-  // actions and route guards re-check.
-  if (!session) {
+  if (!sessionCookie) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);

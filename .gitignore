@@ -37,6 +37,9 @@ yarn-error.log*
 # project spec docs — local only, not committed
 /docs/
 
+# Claude Code local settings
+/.claude/
+
 # vercel
 .vercel
 

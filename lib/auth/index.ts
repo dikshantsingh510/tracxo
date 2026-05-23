@@ -1,19 +1,10 @@
 import { db } from "@/lib/db/client";
+import { sendPasswordReset, sendVerificationOtp } from "@/lib/email/send";
 import { bootstrapPersonalWorkspace } from "@/lib/workspace/bootstrap";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { emailOTP } from "better-auth/plugins";
-
-// TODO(PR #15 — feat/notifications): replace this stub with Resend +
-// react-email templates. The Better Auth contracts (sendVerificationOTP,
-// sendResetPassword) stay the same — only the body of the lambda changes.
-async function sendAuthEmail(
-  channel: "otp" | "reset",
-  payload: { email: string; otp?: string; resetUrl?: string; type?: string },
-): Promise<void> {
-  console.log(`[auth-email/${channel}] ${JSON.stringify(payload)}`);
-}
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -26,7 +17,7 @@ export const auth = betterAuth({
     minPasswordLength: 8,
     maxPasswordLength: 128,
     sendResetPassword: async ({ user, url }) => {
-      await sendAuthEmail("reset", { email: user.email, resetUrl: url });
+      await sendPasswordReset({ to: user.email, resetUrl: url });
     },
   },
   // Without this, /email-otp/verify-email marks the user verified but does
@@ -119,8 +110,8 @@ export const auth = betterAuth({
       // Use OTP instead of magic-link for email verification.
       overrideDefaultEmailVerification: true,
       allowedAttempts: 3,
-      sendVerificationOTP: async ({ email, otp, type }) => {
-        await sendAuthEmail("otp", { email, otp, type });
+      sendVerificationOTP: async ({ email, otp }) => {
+        await sendVerificationOtp({ to: email, otp });
       },
     }),
     nextCookies(),

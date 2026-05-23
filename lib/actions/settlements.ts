@@ -3,6 +3,7 @@
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { activityLog, settlements, workspaceMembers } from "@/lib/db/schema";
+import { createNotifications } from "@/lib/notifications/create";
 import { activityCacheTags } from "@/lib/queries/activity";
 import { balanceCacheTags } from "@/lib/queries/balances";
 import { settlementCacheTags } from "@/lib/queries/settlements";
@@ -84,6 +85,23 @@ export const createSettlement = withAuth(async (session, raw: CreateSettlementIn
   updateTag(settlementCacheTags.workspaceSettlements(input.workspaceId));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
   updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
+
+  // Notify the recipient (toUser) that a payment was recorded for them.
+  // The fromUser already knows — they (or someone acting on their behalf)
+  // recorded it.
+  if (input.toUserId !== actorId) {
+    await createNotifications([
+      {
+        userId: input.toUserId,
+        kind: "settlement.received",
+        title: "Settlement recorded",
+        body: `${input.currency} ${(Number(input.amount) / 100).toFixed(2)} settled to you.`,
+        link: `/workspaces/${input.workspaceId}/settlements`,
+        metadata: { workspaceId: input.workspaceId, settlementId: id },
+      },
+    ]);
+  }
+
   return { id };
 });
 

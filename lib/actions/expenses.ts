@@ -11,6 +11,7 @@ import {
 } from "@/lib/db/schema";
 import { ExpenseVersionConflictError } from "@/lib/expense/errors";
 import { computeSplits } from "@/lib/expense/split";
+import { createNotifications } from "@/lib/notifications/create";
 import { activityCacheTags } from "@/lib/queries/activity";
 import { balanceCacheTags } from "@/lib/queries/balances";
 import { expenseCacheTags } from "@/lib/queries/expenses";
@@ -123,6 +124,22 @@ export const createExpense = withAuth(async (session, raw: CreateExpenseInput) =
   updateTag(expenseCacheTags.workspaceExpenses(input.workspaceId));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
   updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
+
+  // Notify every split participant except the payer (who already knows).
+  const recipientIds = Array.from(
+    new Set(splits.map((s) => s.userId).filter((id) => id !== input.paidBy)),
+  );
+  await createNotifications(
+    recipientIds.map((id) => ({
+      userId: id,
+      kind: "expense.created",
+      title: `New expense added: ${input.description}`,
+      body: `${input.currency} ${(Number(input.amount) / 100).toFixed(2)} — you're in the split.`,
+      link: `/workspaces/${input.workspaceId}/expenses/${expenseId}`,
+      metadata: { workspaceId: input.workspaceId, expenseId, amount: input.amount.toString() },
+    })),
+  );
+
   return { id: expenseId };
 });
 

@@ -5,3 +5,4 @@ export * from "./settlements";
 export * from "./activity";
 export * from "./master";
 export * from "./notifications";
+export * from "./feedback";

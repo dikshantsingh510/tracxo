@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth/server";
 import { countUnreadNotifications, listRecentNotifications } from "@/lib/queries/notifications";
 import Link from "next/link";
+import { FeedbackWidget } from "./feedback-widget";
 import { NotificationBell } from "./notification-bell";
 
 // Minimal wrapper for the authenticated route group. Renders the Frosted
@@ -48,6 +49,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       )}
 
       <div className="relative z-10 mx-auto w-full max-w-4xl">{children}</div>
+      {session && <FeedbackWidget />}
     </main>
   );
 }

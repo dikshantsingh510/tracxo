@@ -1,4 +1,5 @@
 import { requireMaster } from "@/lib/auth/server";
+import { countNewFeedback } from "@/lib/queries/feedback";
 import Link from "next/link";
 
 // Re-verifies the master role in the layout. requireMaster() throws 404 for
@@ -6,6 +7,7 @@ import Link from "next/link";
 // session presence — actual role gating lives here per docs/CLAUDE.md.
 export default async function MasterLayout({ children }: { children: React.ReactNode }) {
   const session = await requireMaster();
+  const newFeedback = await countNewFeedback();
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50">
@@ -28,6 +30,17 @@ export default async function MasterLayout({ children }: { children: React.React
             </Link>
             <Link href="/master/workspaces" className="hover:underline">
               Workspaces
+            </Link>
+            <Link
+              href="/master/feedback"
+              className="inline-flex items-center gap-1.5 hover:underline"
+            >
+              Feedback
+              {newFeedback > 0 && (
+                <span className="inline-flex min-w-4 items-center justify-center rounded-full bg-emerald-600 px-1 font-semibold text-[10px] text-white">
+                  {newFeedback > 9 ? "9+" : newFeedback}
+                </span>
+              )}
             </Link>
             <Link href="/master/audit" className="hover:underline">
               Audit

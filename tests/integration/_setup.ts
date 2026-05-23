@@ -10,7 +10,7 @@ loadEnv({ path: ".env.local", quiet: true });
 
 // Never hit real Resend during tests, even if the dev key is set in
 // .env.local. The email send helper falls back to console.log without it.
-delete process.env.RESEND_API_KEY;
+process.env.RESEND_API_KEY = "";
 
 const TEST_URL = process.env.DATABASE_URL_TEST;
 const DEV_URL = process.env.DATABASE_URL;
@@ -45,6 +45,7 @@ const TABLES_TO_TRUNCATE = [
   "settlements",
   "master_audit_log",
   "notifications",
+  "feedback",
   "workspace_members",
   "workspaces",
   "account",

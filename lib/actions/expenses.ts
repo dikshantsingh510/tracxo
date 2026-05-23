@@ -11,6 +11,7 @@ import {
 } from "@/lib/db/schema";
 import { ExpenseVersionConflictError } from "@/lib/expense/errors";
 import { computeSplits } from "@/lib/expense/split";
+import { activityCacheTags } from "@/lib/queries/activity";
 import { balanceCacheTags } from "@/lib/queries/balances";
 import { expenseCacheTags } from "@/lib/queries/expenses";
 import {
@@ -121,6 +122,7 @@ export const createExpense = withAuth(async (session, raw: CreateExpenseInput) =
 
   updateTag(expenseCacheTags.workspaceExpenses(input.workspaceId));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
   return { id: expenseId };
 });
 
@@ -191,6 +193,7 @@ export const updateExpense = withAuth(async (session, raw: UpdateExpenseInput) =
   updateTag(expenseCacheTags.workspaceExpenses(input.workspaceId));
   updateTag(expenseCacheTags.expense(input.id));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
 });
 
 export const softDeleteExpense = withAuth(async (session, raw: DeleteExpenseInput) => {
@@ -231,4 +234,5 @@ export const softDeleteExpense = withAuth(async (session, raw: DeleteExpenseInpu
   updateTag(expenseCacheTags.workspaceExpenses(input.workspaceId));
   updateTag(expenseCacheTags.expense(input.id));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
 });

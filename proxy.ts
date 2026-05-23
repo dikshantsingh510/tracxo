@@ -36,6 +36,15 @@ export function proxy(req: NextRequest) {
   const sessionCookie = getSessionCookie(req, { cookiePrefix: "tracxo" });
 
   if (!sessionCookie) {
+    // API routes get a JSON 401 instead of an HTML redirect. EventSource and
+    // fetch() consumers can't follow redirects to /login meaningfully — they
+    // need a structured error.
+    if (pathname.startsWith("/api/")) {
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("next", pathname + req.nextUrl.search);
     return NextResponse.redirect(loginUrl);

@@ -56,6 +56,12 @@ export default async function WorkspaceSettingsPage({
             >
               Members →
             </Link>
+            <Link
+              href={`/workspaces/${workspace.id}/activity`}
+              className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
+            >
+              Activity →
+            </Link>
           </div>
         }
       >

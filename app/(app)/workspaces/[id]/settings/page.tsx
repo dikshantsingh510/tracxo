@@ -31,12 +31,20 @@ export default async function WorkspaceSettingsPage({
         title={workspace.name}
         description={`${workspace.type === "personal" ? "Personal workspace" : "Team workspace"} · You are ${workspace.role}`}
         footer={
-          <Link
-            href={`/workspaces/${workspace.id}/members`}
-            className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
-          >
-            Manage members →
-          </Link>
+          <div className="flex items-center justify-center gap-4">
+            <Link
+              href={`/workspaces/${workspace.id}/expenses`}
+              className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
+            >
+              Expenses →
+            </Link>
+            <Link
+              href={`/workspaces/${workspace.id}/members`}
+              className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
+            >
+              Members →
+            </Link>
+          </div>
         }
       >
         <SettingsForm workspace={workspace} currencies={[...currencyCodeEnum.enumValues]} />

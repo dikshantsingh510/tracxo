@@ -12,6 +12,9 @@ export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: false,
   workers: 1,
+  // First test after a dev-server boot occasionally loses the first signup
+  // POST to Better Auth route compilation. One retry absorbs that warm-up.
+  retries: 1,
   reporter: process.env.CI ? "list" : "html",
   timeout: 30_000,
   expect: { timeout: 5_000 },

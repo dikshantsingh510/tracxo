@@ -57,7 +57,11 @@ beforeAll(async () => {
        to_regclass('__drizzle_migrations') AS migrations,
        to_regclass('"user"')               AS user_tbl,
        to_regclass('workspaces')           AS workspaces_tbl`,
-  )) as Array<{ migrations: string | null; user_tbl: string | null; workspaces_tbl: string | null }>;
+  )) as Array<{
+    migrations: string | null;
+    user_tbl: string | null;
+    workspaces_tbl: string | null;
+  }>;
 
   const hasSchema = Boolean(r[0]?.user_tbl && r[0]?.workspaces_tbl);
   const hasTracking = Boolean(r[0]?.migrations);

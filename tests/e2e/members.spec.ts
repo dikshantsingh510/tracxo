@@ -26,7 +26,7 @@ test("owner invites someone via link and they accept in a second browser context
   expect(workspaceId).toBeTruthy();
 
   // Go to members and create an open invite
-  await ownerPage.getByRole("link", { name: /manage members/i }).click();
+  await ownerPage.getByRole("link", { name: /^members →$/i }).click();
   await ownerPage.getByLabel(/email/i).fill("");
   await ownerPage.getByRole("button", { name: /create invitation/i }).click();
   await expect(ownerPage.getByText(/invitation created/i)).toBeVisible();
@@ -80,7 +80,7 @@ test("email-locked invite rejects redemption by a different email", async ({ bro
   await ownerPage.waitForURL(/\/workspaces\/[a-f0-9-]+\/settings/);
   const workspaceId = ownerPage.url().match(/\/workspaces\/([a-f0-9-]+)\//)?.[1];
 
-  await ownerPage.getByRole("link", { name: /manage members/i }).click();
+  await ownerPage.getByRole("link", { name: /^members →$/i }).click();
   await ownerPage.getByLabel(/email/i).fill("intended@x.test");
   await ownerPage.getByRole("button", { name: /create invitation/i }).click();
   await expect(ownerPage.getByText(/invitation created/i)).toBeVisible();

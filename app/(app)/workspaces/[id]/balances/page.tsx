@@ -1,6 +1,6 @@
 import { AuthCard } from "@/components/auth/auth-card";
 import { requireSession } from "@/lib/auth/server";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, minorToDecimalString } from "@/lib/money";
 import { getWorkspaceBalances } from "@/lib/queries/balances";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
 import Link from "next/link";
@@ -96,6 +96,8 @@ export default async function BalancesPage({ params }: { params: Promise<{ id: s
                     {b.transfers.map((t) => {
                       const from = b.names[t.from];
                       const to = b.names[t.to];
+                      const decimal = minorToDecimalString(t.amount, b.currency);
+                      const settleHref = `/workspaces/${workspace.id}/settlements/new?from=${t.from}&to=${t.to}&amount=${decimal}&currency=${b.currency}`;
                       return (
                         <li
                           key={`${t.from}-${t.to}`}
@@ -110,9 +112,17 @@ export default async function BalancesPage({ params }: { params: Promise<{ id: s
                               {to?.name ?? t.to}
                             </span>
                           </div>
-                          <span className="shrink-0 font-semibold text-emerald-700 dark:text-emerald-400">
-                            {formatMoney(t.amount, b.currency)}
-                          </span>
+                          <div className="flex shrink-0 items-center gap-3">
+                            <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+                              {formatMoney(t.amount, b.currency)}
+                            </span>
+                            <Link
+                              href={settleHref}
+                              className="text-emerald-700 text-xs underline-offset-4 hover:underline dark:text-emerald-400"
+                            >
+                              Settle up
+                            </Link>
+                          </div>
                         </li>
                       );
                     })}

@@ -45,6 +45,12 @@ export default async function WorkspaceSettingsPage({
               Balances →
             </Link>
             <Link
+              href={`/workspaces/${workspace.id}/settlements`}
+              className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
+            >
+              Settlements →
+            </Link>
+            <Link
               href={`/workspaces/${workspace.id}/members`}
               className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
             >

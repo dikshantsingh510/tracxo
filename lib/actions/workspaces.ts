@@ -3,6 +3,7 @@
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { activityLog, workspaceMembers, workspaces } from "@/lib/db/schema";
+import { activityCacheTags } from "@/lib/queries/activity";
 import { workspaceCacheTags } from "@/lib/queries/workspaces";
 import {
   type CreateWorkspaceInput,
@@ -74,6 +75,7 @@ export const createWorkspace = withAuth(async (session, raw: CreateWorkspaceInpu
   ]);
 
   updateTag(workspaceCacheTags.userWorkspaces(userId));
+  updateTag(activityCacheTags.workspaceActivity(wsId));
   return { id: wsId };
 });
 
@@ -102,6 +104,7 @@ export const renameWorkspace = withAuth(async (session, raw: RenameWorkspaceInpu
 
   updateTag(workspaceCacheTags.workspaceMeta(input.id));
   updateTag(workspaceCacheTags.userWorkspaces(userId));
+  updateTag(activityCacheTags.workspaceActivity(input.id));
 });
 
 export const updateWorkspaceMeta = withAuth(async (session, raw: UpdateWorkspaceMetaInput) => {
@@ -132,6 +135,7 @@ export const updateWorkspaceMeta = withAuth(async (session, raw: UpdateWorkspace
 
   updateTag(workspaceCacheTags.workspaceMeta(input.id));
   updateTag(workspaceCacheTags.userWorkspaces(userId));
+  updateTag(activityCacheTags.workspaceActivity(input.id));
 });
 
 async function setArchiveStatus(
@@ -166,6 +170,7 @@ async function setArchiveStatus(
 
   updateTag(workspaceCacheTags.workspaceMeta(id));
   updateTag(workspaceCacheTags.userWorkspaces(userId));
+  updateTag(activityCacheTags.workspaceActivity(id));
 }
 
 export const archiveWorkspace = withAuth(async (session, raw: WorkspaceIdInput) => {
@@ -209,4 +214,5 @@ export const softDeleteWorkspace = withAuth(async (session, raw: WorkspaceIdInpu
 
   updateTag(workspaceCacheTags.workspaceMeta(id));
   updateTag(workspaceCacheTags.userWorkspaces(userId));
+  updateTag(activityCacheTags.workspaceActivity(id));
 });

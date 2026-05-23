@@ -3,6 +3,7 @@
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { activityLog, invitations, user, workspaceMembers, workspaces } from "@/lib/db/schema";
+import { activityCacheTags } from "@/lib/queries/activity";
 import { memberCacheTags } from "@/lib/queries/members";
 import { workspaceCacheTags } from "@/lib/queries/workspaces";
 import {
@@ -124,6 +125,7 @@ export const createInvitation = withAuth(async (session, raw: CreateInvitationIn
   }
 
   updateTag(memberCacheTags.workspaceInvites(input.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
   return { id: inviteId, token };
 });
 
@@ -155,6 +157,7 @@ export const revokeInvitation = withAuth(async (session, raw: RevokeInvitationIn
   ]);
 
   updateTag(memberCacheTags.workspaceInvites(input.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
 });
 
 export const redeemInvitation = withAuth(async (session, raw: RedeemInvitationInput) => {
@@ -230,6 +233,7 @@ export const redeemInvitation = withAuth(async (session, raw: RedeemInvitationIn
   updateTag(memberCacheTags.workspaceInvites(invite.workspaceId));
   updateTag(workspaceCacheTags.userWorkspaces(userId));
   updateTag(workspaceCacheTags.workspaceMeta(invite.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(invite.workspaceId));
   return { workspaceId: invite.workspaceId, alreadyMember: false };
 });
 
@@ -277,6 +281,7 @@ export const changeMemberRole = withAuth(async (session, raw: ChangeMemberRoleIn
   ]);
 
   updateTag(memberCacheTags.workspaceMembers(input.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
 });
 
 export const removeMember = withAuth(async (session, raw: RemoveMemberInput) => {
@@ -330,6 +335,7 @@ export const removeMember = withAuth(async (session, raw: RemoveMemberInput) => 
   updateTag(memberCacheTags.workspaceMembers(input.workspaceId));
   updateTag(workspaceCacheTags.userWorkspaces(target.userId));
   updateTag(workspaceCacheTags.workspaceMeta(input.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
 });
 
 export const leaveWorkspace = withAuth(async (session, raw: LeaveWorkspaceInput) => {
@@ -356,6 +362,7 @@ export const leaveWorkspace = withAuth(async (session, raw: LeaveWorkspaceInput)
   updateTag(memberCacheTags.workspaceMembers(workspaceId));
   updateTag(workspaceCacheTags.userWorkspaces(userId));
   updateTag(workspaceCacheTags.workspaceMeta(workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(workspaceId));
 });
 
 export const transferOwnership = withAuth(async (session, raw: TransferOwnershipInput) => {
@@ -415,4 +422,5 @@ export const transferOwnership = withAuth(async (session, raw: TransferOwnership
   updateTag(workspaceCacheTags.workspaceMeta(input.workspaceId));
   updateTag(workspaceCacheTags.userWorkspaces(userId));
   updateTag(workspaceCacheTags.userWorkspaces(newOwner.userId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
 });

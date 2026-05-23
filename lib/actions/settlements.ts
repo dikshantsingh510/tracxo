@@ -3,6 +3,7 @@
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { activityLog, settlements, workspaceMembers } from "@/lib/db/schema";
+import { activityCacheTags } from "@/lib/queries/activity";
 import { balanceCacheTags } from "@/lib/queries/balances";
 import { settlementCacheTags } from "@/lib/queries/settlements";
 import {
@@ -82,6 +83,7 @@ export const createSettlement = withAuth(async (session, raw: CreateSettlementIn
 
   updateTag(settlementCacheTags.workspaceSettlements(input.workspaceId));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
   return { id };
 });
 
@@ -107,4 +109,5 @@ export const softDeleteSettlement = withAuth(async (session, raw: DeleteSettleme
 
   updateTag(settlementCacheTags.workspaceSettlements(input.workspaceId));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
+  updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
 });

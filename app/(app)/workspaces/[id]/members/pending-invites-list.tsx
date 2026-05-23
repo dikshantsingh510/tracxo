@@ -7,8 +7,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-function formatExpiry(d: Date): string {
-  const days = Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+// Date crosses the Server→Client boundary as an ISO string (Next 16 / React 19
+// serialization), so the typed `Date` may actually be a string at runtime.
+function formatExpiry(d: Date | string): string {
+  const ts = typeof d === "string" ? new Date(d).getTime() : d.getTime();
+  const days = Math.ceil((ts - Date.now()) / (1000 * 60 * 60 * 24));
   if (days <= 0) return "expired";
   if (days === 1) return "expires in 1 day";
   return `expires in ${days} days`;

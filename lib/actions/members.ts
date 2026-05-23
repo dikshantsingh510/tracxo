@@ -3,6 +3,8 @@
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { activityLog, invitations, user, workspaceMembers, workspaces } from "@/lib/db/schema";
+import { sendWorkspaceInvite } from "@/lib/email/send";
+import { createNotifications } from "@/lib/notifications/create";
 import { activityCacheTags } from "@/lib/queries/activity";
 import { memberCacheTags } from "@/lib/queries/members";
 import { workspaceCacheTags } from "@/lib/queries/workspaces";
@@ -22,7 +24,7 @@ import {
   revokeInvitationSchema,
   transferOwnershipSchema,
 } from "@/lib/validation/member";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { updateTag } from "next/cache";
 
 // Per PROMPT.md §15.2: every mutation invalidates every reader's tag.
@@ -33,17 +35,6 @@ import { updateTag } from "next/cache";
 //   - workspace:<id>:meta        (count of members may be surfaced later)
 
 const INVITE_EXPIRY_DAYS = 7;
-
-// TODO(PR #15 — feat/notifications): replace with real Resend + react-email
-// template. Contract stays the same.
-async function sendInviteEmail(payload: {
-  to: string;
-  workspaceName: string;
-  inviteUrl: string;
-  role: "admin" | "member";
-}): Promise<void> {
-  console.log(`[invite-email] ${JSON.stringify(payload)}`);
-}
 
 async function getMembership(
   workspaceId: string,
@@ -116,7 +107,7 @@ export const createInvitation = withAuth(async (session, raw: CreateInvitationIn
       .from(workspaces)
       .where(eq(workspaces.id, input.workspaceId))
       .limit(1);
-    await sendInviteEmail({
+    await sendWorkspaceInvite({
       to: email,
       workspaceName: ws?.name ?? "a workspace",
       inviteUrl,
@@ -234,6 +225,39 @@ export const redeemInvitation = withAuth(async (session, raw: RedeemInvitationIn
   updateTag(workspaceCacheTags.userWorkspaces(userId));
   updateTag(workspaceCacheTags.workspaceMeta(invite.workspaceId));
   updateTag(activityCacheTags.workspaceActivity(invite.workspaceId));
+
+  // Notify the workspace's owner + admins that someone just joined.
+  const [joiner] = await db
+    .select({ name: user.name })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
+  const [ws] = await db
+    .select({ name: workspaces.name })
+    .from(workspaces)
+    .where(eq(workspaces.id, invite.workspaceId))
+    .limit(1);
+  const recipients = await db
+    .select({ userId: workspaceMembers.userId })
+    .from(workspaceMembers)
+    .where(
+      and(
+        eq(workspaceMembers.workspaceId, invite.workspaceId),
+        inArray(workspaceMembers.role, ["owner", "admin"]),
+      ),
+    );
+  await createNotifications(
+    recipients
+      .filter((r) => r.userId !== userId)
+      .map((r) => ({
+        userId: r.userId,
+        kind: "member.joined",
+        title: `${joiner?.name ?? "Someone"} joined ${ws?.name ?? "your workspace"}`,
+        link: `/workspaces/${invite.workspaceId}/members`,
+        metadata: { workspaceId: invite.workspaceId, newMemberId: userId },
+      })),
+  );
+
   return { workspaceId: invite.workspaceId, alreadyMember: false };
 });
 
@@ -282,6 +306,16 @@ export const changeMemberRole = withAuth(async (session, raw: ChangeMemberRoleIn
 
   updateTag(memberCacheTags.workspaceMembers(input.workspaceId));
   updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
+
+  await createNotifications([
+    {
+      userId: target.userId,
+      kind: "member.role_changed",
+      title: `Your role changed to ${input.role}`,
+      link: `/workspaces/${input.workspaceId}/members`,
+      metadata: { workspaceId: input.workspaceId, from: target.role, to: input.role },
+    },
+  ]);
 });
 
 export const removeMember = withAuth(async (session, raw: RemoveMemberInput) => {
@@ -336,6 +370,21 @@ export const removeMember = withAuth(async (session, raw: RemoveMemberInput) => 
   updateTag(workspaceCacheTags.userWorkspaces(target.userId));
   updateTag(workspaceCacheTags.workspaceMeta(input.workspaceId));
   updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
+
+  const [ws] = await db
+    .select({ name: workspaces.name })
+    .from(workspaces)
+    .where(eq(workspaces.id, input.workspaceId))
+    .limit(1);
+  await createNotifications([
+    {
+      userId: target.userId,
+      kind: "member.removed",
+      title: `You were removed from ${ws?.name ?? "a workspace"}`,
+      link: "/workspaces",
+      metadata: { workspaceId: input.workspaceId },
+    },
+  ]);
 });
 
 export const leaveWorkspace = withAuth(async (session, raw: LeaveWorkspaceInput) => {

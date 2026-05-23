@@ -29,6 +29,13 @@
       "when": 1779264726573,
       "tag": "0003_profile_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1779537612381,
+      "tag": "0004_sticky_mandroid",
+      "breakpoints": true
     }
   ]
 }

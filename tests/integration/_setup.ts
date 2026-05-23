@@ -39,6 +39,7 @@ const TABLES_TO_TRUNCATE = [
   "expense_splits",
   "expenses",
   "settlements",
+  "master_audit_log",
   "workspace_members",
   "workspaces",
   "account",

@@ -2,7 +2,13 @@
 
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
-import { activityLog, expenseSplits, expenses, workspaceMembers } from "@/lib/db/schema";
+import {
+  activityLog,
+  expenseSplits,
+  expenses,
+  settlements,
+  workspaceMembers,
+} from "@/lib/db/schema";
 import { ExpenseVersionConflictError } from "@/lib/expense/errors";
 import { computeSplits } from "@/lib/expense/split";
 import { balanceCacheTags } from "@/lib/queries/balances";
@@ -16,7 +22,7 @@ import {
   deleteExpenseSchema,
   updateExpenseSchema,
 } from "@/lib/validation/expense";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { updateTag } from "next/cache";
 
 // Per PROMPT.md §15.2: invalidate every reader's tag. Expense writes invalidate:
@@ -193,8 +199,20 @@ export const softDeleteExpense = withAuth(async (session, raw: DeleteExpenseInpu
 
   await assertMember(input.workspaceId, userId);
 
-  // TODO(PR #11 — feat/settlement): block if the expense has any
-  // associated settlement rows. Until then, soft-delete is unconditional.
+  // Per CLAUDE.md: cannot delete an expense once any settlement exists in
+  // the workspace — settled history must stay immutable. v1 uses a strict
+  // workspace-level guard since the schema doesn't link settlements to
+  // specific expenses.
+  const [hasSettlement] = await db
+    .select({ id: settlements.id })
+    .from(settlements)
+    .where(and(eq(settlements.workspaceId, input.workspaceId), isNull(settlements.deletedAt)))
+    .limit(1);
+  if (hasSettlement) {
+    throw new Error(
+      "Cannot delete an expense after a settlement has been recorded in this workspace",
+    );
+  }
 
   await db.batch([
     db

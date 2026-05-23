@@ -29,6 +29,12 @@ export const auth = betterAuth({
       await sendAuthEmail("reset", { email: user.email, resetUrl: url });
     },
   },
+  // Without this, /email-otp/verify-email marks the user verified but does
+  // NOT create a session — the user gets a "verified!" response and is then
+  // forced to sign in again. Auto-signing in matches PRODUCT.md expectations.
+  emailVerification: {
+    autoSignInAfterVerification: true,
+  },
   user: {
     additionalFields: {
       role: {
@@ -73,6 +79,13 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: "tracxo",
   },
+  // Better Auth rejects POSTs whose Origin header doesn't match a trusted
+  // entry — CSRF protection. Dev: allow common localhost ports including the
+  // Playwright port. Prod: pin to NEXT_PUBLIC_APP_URL.
+  trustedOrigins:
+    process.env.NODE_ENV === "production"
+      ? ([process.env.NEXT_PUBLIC_APP_URL].filter(Boolean) as string[])
+      : ["http://localhost:3000", "http://localhost:3100"],
   // Auto-create a personal workspace + owner membership row whenever a new
   // user row is inserted (email signup, OAuth first-login, OTP signup). The
   // hook is idempotent — see lib/workspace/bootstrap.ts.

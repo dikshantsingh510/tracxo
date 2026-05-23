@@ -21,8 +21,8 @@ test("owner invites someone via link and they accept in a second browser context
   await ownerPage.getByRole("link", { name: /new workspace/i }).click();
   await ownerPage.getByLabel(/^name$/i).fill("Goa Trip");
   await ownerPage.getByRole("button", { name: /create workspace/i }).click();
-  const settingsUrl = ownerPage.url();
-  const workspaceId = settingsUrl.match(/\/workspaces\/([a-f0-9-]+)\//)?.[1];
+  await ownerPage.waitForURL(/\/workspaces\/[a-f0-9-]+\/settings/);
+  const workspaceId = ownerPage.url().match(/\/workspaces\/([a-f0-9-]+)\//)?.[1];
   expect(workspaceId).toBeTruthy();
 
   // Go to members and create an open invite
@@ -77,6 +77,7 @@ test("email-locked invite rejects redemption by a different email", async ({ bro
   await ownerPage.getByRole("link", { name: /new workspace/i }).click();
   await ownerPage.getByLabel(/^name$/i).fill("Locked");
   await ownerPage.getByRole("button", { name: /create workspace/i }).click();
+  await ownerPage.waitForURL(/\/workspaces\/[a-f0-9-]+\/settings/);
   const workspaceId = ownerPage.url().match(/\/workspaces\/([a-f0-9-]+)\//)?.[1];
 
   await ownerPage.getByRole("link", { name: /manage members/i }).click();

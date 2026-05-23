@@ -26,15 +26,23 @@ export async function truncateAll(): Promise<void> {
 }
 
 // Better Auth's emailOTP plugin stores codes in the verification table.
-// `identifier` is the recipient email, `value` holds the OTP string.
-// Most-recent unredeemed record wins.
-export async function getOtpForEmail(email: string): Promise<string | null> {
+// Identifier shape (from plugins/email-otp/utils): `${type}-otp-${email}`.
+// Value is plain text (`storeOTP: "plain"` is the plugin default) with an
+// optional `:<attempts>` suffix appended on failed verify attempts.
+export async function getOtpForEmail(
+  email: string,
+  type: "email-verification" | "sign-in" | "forget-password" = "email-verification",
+): Promise<string | null> {
+  const identifier = `${type}-otp-${email}`;
   const rows = (await sql.query(
     `SELECT value FROM verification
      WHERE identifier = $1 AND expires_at > NOW()
      ORDER BY created_at DESC LIMIT 1`,
-    [email],
+    [identifier],
   )) as Array<{ value: string }>;
 
-  return rows[0]?.value ?? null;
+  const raw = rows[0]?.value;
+  if (!raw) return null;
+  const idx = raw.lastIndexOf(":");
+  return idx === -1 ? raw : raw.slice(0, idx);
 }

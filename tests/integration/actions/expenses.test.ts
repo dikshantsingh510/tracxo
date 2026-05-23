@@ -64,10 +64,7 @@ describe.skipIf(!hasTestDb)("expense actions (integration)", () => {
       expect(e.splitMode).toBe("equal");
       expect(e.version).toBe(1);
 
-      const splits = await db
-        .select()
-        .from(expenseSplits)
-        .where(eq(expenseSplits.expenseId, id));
+      const splits = await db.select().from(expenseSplits).where(eq(expenseSplits.expenseId, id));
       expect(splits).toHaveLength(3);
       expect(splits.reduce((s, r) => s + r.shareAmount, 0n)).toBe(900n);
     });
@@ -295,10 +292,7 @@ describe.skipIf(!hasTestDb)("expense actions (integration)", () => {
         },
       });
 
-      const splits = await db
-        .select()
-        .from(expenseSplits)
-        .where(eq(expenseSplits.expenseId, id));
+      const splits = await db.select().from(expenseSplits).where(eq(expenseSplits.expenseId, id));
       expect(splits.reduce((s, r) => s + r.shareAmount, 0n)).toBe(1000n);
     });
   });

@@ -29,7 +29,10 @@ test("equal split: create → view → delete an expense in a personal workspace
   await page.waitForURL(/\/expenses\/new$/);
 
   await page.getByPlaceholder(/dinner at bombil/i).fill("Lunch");
-  await page.getByPlaceholder(/^0\.00$/).first().fill("12.50");
+  await page
+    .getByPlaceholder(/^0\.00$/)
+    .first()
+    .fill("12.50");
   // Default currency from workspace; split defaults to equal with all members.
   await page.getByRole("button", { name: /create expense/i }).click();
 

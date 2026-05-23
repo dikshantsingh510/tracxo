@@ -31,12 +31,18 @@ export default async function WorkspaceSettingsPage({
         title={workspace.name}
         description={`${workspace.type === "personal" ? "Personal workspace" : "Team workspace"} · You are ${workspace.role}`}
         footer={
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <Link
               href={`/workspaces/${workspace.id}/expenses`}
               className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
             >
               Expenses →
+            </Link>
+            <Link
+              href={`/workspaces/${workspace.id}/balances`}
+              className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
+            >
+              Balances →
             </Link>
             <Link
               href={`/workspaces/${workspace.id}/members`}

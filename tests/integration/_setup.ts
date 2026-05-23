@@ -36,6 +36,9 @@ const testDb = sql ? drizzle({ client: sql, casing: "snake_case" }) : null;
 const TABLES_TO_TRUNCATE = [
   "activity_log",
   "invitations",
+  "expense_splits",
+  "expenses",
+  "settlements",
   "workspace_members",
   "workspaces",
   "account",

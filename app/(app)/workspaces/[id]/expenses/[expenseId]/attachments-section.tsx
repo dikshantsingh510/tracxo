@@ -1,5 +1,7 @@
 "use client";
 
+import { uuidv7 } from "uuidv7";
+
 import { Button } from "@/components/ui/button";
 import { deleteAttachment, recordAttachment } from "@/lib/actions/attachments";
 import type { AttachmentRow } from "@/lib/queries/attachments";
@@ -46,7 +48,7 @@ export function AttachmentsSection({
     setUploading(true);
     try {
       // Pathname: expense scoped, randomized to avoid collisions across uploads.
-      const blob = await upload(`expenses/${expenseId}/${crypto.randomUUID()}-${file.name}`, file, {
+      const blob = await upload(`expenses/${expenseId}/${uuidv7()}-${file.name}`, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
         contentType: file.type,

@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import { relations } from "drizzle-orm";
 import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth";
@@ -8,7 +10,7 @@ export const expenseComments = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     expenseId: text("expense_id")
       .notNull()
       .references(() => expenses.id, { onDelete: "cascade" }),

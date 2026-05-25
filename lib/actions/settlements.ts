@@ -1,5 +1,7 @@
 "use server";
 
+import { uuidv7 } from "uuidv7";
+
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { activityLog, settlements, workspaceMembers } from "@/lib/db/schema";
@@ -52,7 +54,7 @@ export const createSettlement = withAuth(async (session, raw: CreateSettlementIn
   await assertMember(input.workspaceId, actorId);
   await assertMembersInWorkspace(input.workspaceId, [input.fromUserId, input.toUserId]);
 
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   await db.batch([
     db.insert(settlements).values({
       id,

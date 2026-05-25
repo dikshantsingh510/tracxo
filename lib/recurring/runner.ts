@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import "server-only";
 
 import { db } from "@/lib/db/client";
@@ -49,7 +51,7 @@ export async function runRecurringExpenses(now: Date = new Date()): Promise<Runn
       const split = template.splitDetails as SplitInput;
       const splits = computeSplits(template.amount, split);
 
-      const expenseId = crypto.randomUUID();
+      const expenseId = uuidv7();
       const occurrenceDate = template.nextRunAt.toISOString().slice(0, 10);
 
       await db.batch([

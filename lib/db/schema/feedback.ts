@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import { relations } from "drizzle-orm";
 import { index, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { user } from "./auth";
@@ -16,7 +18,7 @@ export const feedback = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
     type: feedbackTypeEnum("type").notNull().default("general"),
     message: text("message").notNull(),

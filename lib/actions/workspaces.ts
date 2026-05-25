@@ -1,5 +1,7 @@
 "use server";
 
+import { uuidv7 } from "uuidv7";
+
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { activityLog, workspaceMembers, workspaces } from "@/lib/db/schema";
@@ -48,7 +50,7 @@ async function assertCanManageWorkspace(
 export const createWorkspace = withAuth(async (session, raw: CreateWorkspaceInput) => {
   const input = createWorkspaceSchema.parse(raw);
   const userId = session.user.id;
-  const wsId = crypto.randomUUID();
+  const wsId = uuidv7();
 
   await db.batch([
     db.insert(workspaces).values({

@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import {
   archiveWorkspace,
   createWorkspace,
@@ -167,7 +169,7 @@ describe.skipIf(!hasTestDb)("workspace actions (integration)", () => {
       expect(ws.deletedAt).not.toBeNull();
 
       // create a personal workspace via direct insert (bootstrap path)
-      const personalId = crypto.randomUUID();
+      const personalId = uuidv7();
       await db.batch([
         db.insert(workspaces).values({
           id: personalId,

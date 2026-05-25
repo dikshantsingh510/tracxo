@@ -1,5 +1,7 @@
 "use server";
 
+import { uuidv7 } from "uuidv7";
+
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import {
@@ -85,7 +87,7 @@ export const createExpense = withAuth(async (session, raw: CreateExpenseInput) =
   // distributes via largest-remainder so sum always equals total.
   const splits = computeSplits(input.amount, input.split);
 
-  const expenseId = crypto.randomUUID();
+  const expenseId = uuidv7();
   await db.batch([
     db.insert(expenses).values({
       id: expenseId,

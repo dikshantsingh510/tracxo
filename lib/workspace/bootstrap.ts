@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import "server-only";
 
 import { db } from "@/lib/db/client";
@@ -24,7 +26,7 @@ export async function bootstrapPersonalWorkspace(params: {
 
   if (existing) return null;
 
-  const wsId = crypto.randomUUID();
+  const wsId = uuidv7();
   const friendlyName = userName.trim().length > 0 ? `${userName.trim()}'s Space` : "Personal";
 
   await db.batch([

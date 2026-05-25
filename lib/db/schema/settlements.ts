@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
@@ -24,7 +26,7 @@ export const settlements = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     workspaceId: text("workspace_id")
       .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),

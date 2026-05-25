@@ -1,5 +1,7 @@
 "use server";
 
+import { uuidv7 } from "uuidv7";
+
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { recurringExpenses, workspaceMembers } from "@/lib/db/schema";
@@ -72,7 +74,7 @@ export const createRecurring = withAuth(async (session, raw: CreateRecurringInpu
   const firstRun = firstRunAtOrAfter(rule, now);
   if (!firstRun) throw new Error("Schedule has no upcoming occurrences");
 
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   await db.insert(recurringExpenses).values({
     id,
     workspaceId: input.workspaceId,

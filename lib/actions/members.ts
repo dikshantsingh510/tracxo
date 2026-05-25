@@ -1,5 +1,7 @@
 "use server";
 
+import { uuidv7 } from "uuidv7";
+
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { activityLog, invitations, user, workspaceMembers, workspaces } from "@/lib/db/schema";
@@ -60,6 +62,9 @@ async function requireRole(
 }
 
 function generateInviteToken(): string {
+  // Tokens must be unguessable. uuidv7 is time-ordered (good for index
+  // locality, bad for secrets); v4 here is the right tool — it's the same
+  // entropy as before this PR.
   return crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
 }
 
@@ -74,7 +79,7 @@ export const createInvitation = withAuth(async (session, raw: CreateInvitationIn
     "Only owners and admins can create invitations",
   );
 
-  const inviteId = crypto.randomUUID();
+  const inviteId = uuidv7();
   const token = generateInviteToken();
   const expiresAt = new Date(Date.now() + INVITE_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
   const email = input.email && input.email.trim() !== "" ? input.email : null;
@@ -198,7 +203,7 @@ export const redeemInvitation = withAuth(async (session, raw: RedeemInvitationIn
     return { workspaceId: invite.workspaceId, alreadyMember: true };
   }
 
-  const memberId = crypto.randomUUID();
+  const memberId = uuidv7();
   await db.batch([
     db.insert(workspaceMembers).values({
       id: memberId,

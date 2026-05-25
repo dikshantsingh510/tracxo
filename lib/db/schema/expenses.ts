@@ -14,6 +14,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth";
+import { expenseCategories } from "./categories";
 import { workspaces } from "./workspaces";
 
 export const splitModeEnum = pgEnum("split_mode", [
@@ -39,7 +40,12 @@ export const expenses = pgTable(
     amount: bigint("amount", { mode: "bigint" }).notNull(),
     currency: varchar("currency", { length: 3 }).notNull(),
     description: varchar("description", { length: 200 }).notNull(),
+    // Legacy free-text category — superseded by categoryId. Kept additive per
+    // CLAUDE.md (no drop without explicit approval). New writes set categoryId.
     category: varchar("category", { length: 50 }),
+    categoryId: text("category_id").references(() => expenseCategories.id, {
+      onDelete: "set null",
+    }),
     notes: text("notes"),
     expenseDate: date("expense_date").notNull(),
     splitMode: splitModeEnum("split_mode").notNull().default("equal"),
@@ -63,6 +69,7 @@ export const expenses = pgTable(
     index("expenses_expense_date_idx").on(t.expenseDate),
     index("expenses_deleted_at_idx").on(t.deletedAt),
     index("expenses_workspace_date_idx").on(t.workspaceId, t.expenseDate),
+    index("expenses_category_id_idx").on(t.categoryId),
     check("expenses_amount_positive", sql`${t.amount} > 0`),
   ],
 );
@@ -97,6 +104,10 @@ export const expensesRelations = relations(expenses, ({ one, many }) => ({
     references: [workspaces.id],
   }),
   payer: one(user, { fields: [expenses.paidBy], references: [user.id] }),
+  category: one(expenseCategories, {
+    fields: [expenses.categoryId],
+    references: [expenseCategories.id],
+  }),
   splits: many(expenseSplits),
 }));
 

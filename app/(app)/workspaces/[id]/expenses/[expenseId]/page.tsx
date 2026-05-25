@@ -1,12 +1,17 @@
 import { AuthCard } from "@/components/auth/auth-card";
 import { requireSession } from "@/lib/auth/server";
 import { formatMoney } from "@/lib/money";
+import { listAttachments } from "@/lib/queries/attachments";
+import { listCategories } from "@/lib/queries/categories";
+import { listComments } from "@/lib/queries/comments";
 import { getExpense, getMembershipRole } from "@/lib/queries/expenses";
 import { getWorkspaceMembers } from "@/lib/queries/members";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExpenseForm } from "../expense-form";
+import { AttachmentsSection } from "./attachments-section";
+import { CommentsThread } from "./comments-thread";
 import { ExpenseActions } from "./expense-actions";
 
 export const metadata = { title: "Expense · Tracxo" };
@@ -32,6 +37,7 @@ export default async function ExpenseDetailPage({
 
   if (edit === "1") {
     const members = await getWorkspaceMembers(workspace.id);
+    const categories = await listCategories(workspace.id);
     return (
       <div className="mx-auto w-full max-w-2xl space-y-4">
         <Link
@@ -47,6 +53,7 @@ export default async function ExpenseDetailPage({
             workspaceCurrency={workspace.defaultCurrency}
             actorUserId={session.user.id}
             members={members.map((m) => ({ userId: m.userId, name: m.name, email: m.email }))}
+            categories={categories.map((c) => ({ id: c.id, name: c.name }))}
             initial={{
               id: expense.id,
               version: expense.version,
@@ -54,6 +61,7 @@ export default async function ExpenseDetailPage({
               amount: expense.amount,
               currency: expense.currency,
               category: expense.category ?? "",
+              categoryId: expense.categoryId ?? null,
               notes: expense.notes ?? "",
               expenseDate: expense.expenseDate,
               paidBy: expense.paidBy,
@@ -69,6 +77,11 @@ export default async function ExpenseDetailPage({
       </div>
     );
   }
+
+  const [attachments, comments] = await Promise.all([
+    listAttachments(expense.id),
+    listComments(expense.id),
+  ]);
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-4">
@@ -95,9 +108,21 @@ export default async function ExpenseDetailPage({
             <div className="font-semibold text-3xl text-emerald-700 tracking-tight dark:text-emerald-400">
               {formatMoney(expense.amount, expense.currency)}
             </div>
-            {expense.category && (
-              <div className="mt-1 text-slate-500 text-xs dark:text-slate-400">
-                {expense.category}
+            {(expense.categoryName || expense.category) && (
+              <div className="mt-1.5">
+                <span
+                  className="inline-block rounded-full px-2 py-0.5 text-xs"
+                  style={
+                    expense.categoryColor
+                      ? {
+                          backgroundColor: `${expense.categoryColor}1a`,
+                          color: expense.categoryColor,
+                        }
+                      : undefined
+                  }
+                >
+                  {expense.categoryName ?? expense.category}
+                </span>
               </div>
             )}
           </div>
@@ -133,6 +158,29 @@ export default async function ExpenseDetailPage({
               </p>
             </div>
           )}
+
+          <div>
+            <h3 className="mb-2 font-medium text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
+              Attachments
+            </h3>
+            <AttachmentsSection
+              workspaceId={workspace.id}
+              expenseId={expense.id}
+              initial={attachments}
+            />
+          </div>
+
+          <div>
+            <h3 className="mb-2 font-medium text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
+              Comments
+            </h3>
+            <CommentsThread
+              workspaceId={workspace.id}
+              expenseId={expense.id}
+              initial={comments}
+              currentUserId={session.user.id}
+            />
+          </div>
         </div>
       </AuthCard>
     </div>

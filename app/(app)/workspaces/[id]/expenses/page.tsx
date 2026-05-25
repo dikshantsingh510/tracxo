@@ -51,8 +51,23 @@ export default async function ExpensesPage({ params }: { params: Promise<{ id: s
                 >
                   <div className="flex items-baseline justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="truncate font-medium text-slate-900 text-sm dark:text-slate-50">
+                      <div className="flex items-center gap-2 truncate font-medium text-slate-900 text-sm dark:text-slate-50">
                         {e.description}
+                        {e.categoryName && (
+                          <span
+                            className="rounded-full px-1.5 py-0.5 font-normal text-[10px]"
+                            style={
+                              e.categoryColor
+                                ? {
+                                    backgroundColor: `${e.categoryColor}1a`,
+                                    color: e.categoryColor,
+                                  }
+                                : undefined
+                            }
+                          >
+                            {e.categoryName}
+                          </span>
+                        )}
                       </div>
                       <div className="truncate text-slate-500 text-xs dark:text-slate-400">
                         {e.payerName} paid · {e.expenseDate} · {e.splitMode}

@@ -1,5 +1,7 @@
 "use server";
 
+import { uuidv7 } from "uuidv7";
+
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { expenseCategories, workspaceMembers } from "@/lib/db/schema";
@@ -34,7 +36,7 @@ export const createCategory = withAuth(async (session, raw: CreateCategoryInput)
   const input = createCategorySchema.parse(raw);
   await assertMember(input.workspaceId, session.user.id);
 
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   await db.insert(expenseCategories).values({
     id,
     workspaceId: input.workspaceId,

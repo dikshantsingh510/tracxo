@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -23,7 +25,7 @@ export const recurringExpenses = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     workspaceId: text("workspace_id")
       .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),
@@ -65,7 +67,7 @@ export const recurringExpenseRuns = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     recurringId: text("recurring_id")
       .notNull()
       .references(() => recurringExpenses.id, { onDelete: "cascade" }),

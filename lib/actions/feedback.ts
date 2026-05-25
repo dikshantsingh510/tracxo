@@ -1,5 +1,7 @@
 "use server";
 
+import { uuidv7 } from "uuidv7";
+
 import { withAuth, withMasterAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { feedback, masterAuditLog } from "@/lib/db/schema";
@@ -17,7 +19,7 @@ export const createFeedback = withAuth(async (session, raw: CreateFeedbackInput)
   const input = createFeedbackSchema.parse(raw);
   const userId = session.user.id;
 
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   await db.insert(feedback).values({
     id,
     userId,

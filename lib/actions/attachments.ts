@@ -1,5 +1,7 @@
 "use server";
 
+import { uuidv7 } from "uuidv7";
+
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import { activityLog, expenseAttachments, expenses, workspaceMembers } from "@/lib/db/schema";
@@ -46,7 +48,7 @@ export const recordAttachment = withAuth(async (session, raw: RecordAttachmentIn
   await assertMember(input.workspaceId, session.user.id);
   await assertExpenseInWorkspace(input.expenseId, input.workspaceId);
 
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   await db.batch([
     db.insert(expenseAttachments).values({
       id,

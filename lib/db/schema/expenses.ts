@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
@@ -30,7 +32,7 @@ export const expenses = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     workspaceId: text("workspace_id")
       .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),
@@ -79,7 +81,7 @@ export const expenseSplits = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     expenseId: text("expense_id")
       .notNull()
       .references(() => expenses.id, { onDelete: "cascade" }),

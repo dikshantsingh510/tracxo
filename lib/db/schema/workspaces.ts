@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import { relations, sql } from "drizzle-orm";
 import { index, pgEnum, pgTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 import { user } from "./auth";
@@ -11,7 +13,7 @@ export const workspaces = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     name: varchar("name", { length: 100 }).notNull(),
     icon: varchar("icon", { length: 64 }),
     defaultCurrency: varchar("default_currency", { length: 3 }).notNull().default("INR"),
@@ -40,7 +42,7 @@ export const workspaceMembers = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     workspaceId: text("workspace_id")
       .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),
@@ -62,7 +64,7 @@ export const invitations = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => uuidv7()),
     workspaceId: text("workspace_id")
       .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),

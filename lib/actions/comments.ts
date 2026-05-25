@@ -1,5 +1,7 @@
 "use server";
 
+import { uuidv7 } from "uuidv7";
+
 import { withAuth } from "@/lib/auth/with-auth";
 import { db } from "@/lib/db/client";
 import {
@@ -53,7 +55,7 @@ export const createComment = withAuth(async (session, raw: CreateCommentInput) =
   await assertMember(input.workspaceId, session.user.id);
   const ctx = await loadExpenseContext(input.expenseId, input.workspaceId);
 
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   await db.batch([
     db.insert(expenseComments).values({
       id,

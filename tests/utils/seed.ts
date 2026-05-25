@@ -1,3 +1,5 @@
+import { uuidv7 } from "uuidv7";
+
 import { db } from "@/lib/db/client";
 import { user, workspaceMembers, workspaces } from "@/lib/db/schema";
 
@@ -5,7 +7,7 @@ let counter = 0;
 
 export async function seedUser(overrides: Partial<{ email: string; name: string }> = {}) {
   counter += 1;
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   const email = overrides.email ?? `u${counter}-${Date.now()}@test.local`;
   const name = overrides.name ?? `User ${counter}`;
 
@@ -31,7 +33,7 @@ export async function seedWorkspace(params: {
   type?: "personal" | "team";
   defaultCurrency?: string;
 }) {
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   await db.batch([
     db.insert(workspaces).values({
       id,
@@ -54,7 +56,7 @@ export async function addMember(params: {
   userId: string;
   role?: "owner" | "admin" | "member";
 }) {
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   await db.insert(workspaceMembers).values({
     id,
     workspaceId: params.workspaceId,

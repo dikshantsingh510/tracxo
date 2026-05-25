@@ -13,6 +13,7 @@ import { ExpenseVersionConflictError } from "@/lib/expense/errors";
 import { computeSplits } from "@/lib/expense/split";
 import { createNotifications } from "@/lib/notifications/create";
 import { activityCacheTags } from "@/lib/queries/activity";
+import { analyticsCacheTags } from "@/lib/queries/analytics";
 import { balanceCacheTags } from "@/lib/queries/balances";
 import { expenseCacheTags } from "@/lib/queries/expenses";
 import {
@@ -125,6 +126,7 @@ export const createExpense = withAuth(async (session, raw: CreateExpenseInput) =
   updateTag(expenseCacheTags.workspaceExpenses(input.workspaceId));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
   updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
+  updateTag(analyticsCacheTags.workspaceAnalytics(input.workspaceId));
 
   // Notify every split participant except the payer (who already knows).
   const recipientIds = Array.from(
@@ -213,6 +215,7 @@ export const updateExpense = withAuth(async (session, raw: UpdateExpenseInput) =
   updateTag(expenseCacheTags.expense(input.id));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
   updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
+  updateTag(analyticsCacheTags.workspaceAnalytics(input.workspaceId));
 });
 
 export const softDeleteExpense = withAuth(async (session, raw: DeleteExpenseInput) => {
@@ -254,4 +257,5 @@ export const softDeleteExpense = withAuth(async (session, raw: DeleteExpenseInpu
   updateTag(expenseCacheTags.expense(input.id));
   updateTag(balanceCacheTags.workspaceBalances(input.workspaceId));
   updateTag(activityCacheTags.workspaceActivity(input.workspaceId));
+  updateTag(analyticsCacheTags.workspaceAnalytics(input.workspaceId));
 });

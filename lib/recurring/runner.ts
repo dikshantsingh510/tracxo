@@ -11,6 +11,7 @@ import {
 import { computeSplits } from "@/lib/expense/split";
 import { createNotifications } from "@/lib/notifications/create";
 import { activityCacheTags } from "@/lib/queries/activity";
+import { analyticsCacheTags } from "@/lib/queries/analytics";
 import { balanceCacheTags } from "@/lib/queries/balances";
 import { expenseCacheTags } from "@/lib/queries/expenses";
 import { recurringCacheTags } from "@/lib/queries/recurring";
@@ -110,6 +111,7 @@ export async function runRecurringExpenses(now: Date = new Date()): Promise<Runn
       updateTag(balanceCacheTags.workspaceBalances(template.workspaceId));
       updateTag(activityCacheTags.workspaceActivity(template.workspaceId));
       updateTag(recurringCacheTags.workspaceRecurring(template.workspaceId));
+      updateTag(analyticsCacheTags.workspaceAnalytics(template.workspaceId));
 
       // Notify split participants except the payer.
       const recipientIds = Array.from(

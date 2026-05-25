@@ -1,7 +1,13 @@
 import "server-only";
 
 import { db } from "@/lib/db/client";
-import { expenseSplits, expenses, user, workspaceMembers } from "@/lib/db/schema";
+import {
+  expenseCategories,
+  expenseSplits,
+  expenses,
+  user,
+  workspaceMembers,
+} from "@/lib/db/schema";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 
@@ -17,6 +23,9 @@ export type ExpenseRow = {
   amount: bigint;
   currency: string;
   category: string | null;
+  categoryId: string | null;
+  categoryName: string | null;
+  categoryColor: string | null;
   expenseDate: string;
   splitMode: "equal" | "unequal" | "percentage" | "share" | "itemized";
   paidBy: string;
@@ -36,6 +45,9 @@ async function listExpensesQuery(workspaceId: string): Promise<ExpenseRow[]> {
       amount: expenses.amount,
       currency: expenses.currency,
       category: expenses.category,
+      categoryId: expenses.categoryId,
+      categoryName: expenseCategories.name,
+      categoryColor: expenseCategories.color,
       expenseDate: expenses.expenseDate,
       splitMode: expenses.splitMode,
       paidBy: expenses.paidBy,
@@ -47,6 +59,7 @@ async function listExpensesQuery(workspaceId: string): Promise<ExpenseRow[]> {
     })
     .from(expenses)
     .innerJoin(user, eq(user.id, expenses.paidBy))
+    .leftJoin(expenseCategories, eq(expenseCategories.id, expenses.categoryId))
     .where(and(eq(expenses.workspaceId, workspaceId), isNull(expenses.deletedAt)))
     .orderBy(desc(expenses.expenseDate), desc(expenses.createdAt));
 }
@@ -83,6 +96,9 @@ async function getExpenseQuery(
       amount: expenses.amount,
       currency: expenses.currency,
       category: expenses.category,
+      categoryId: expenses.categoryId,
+      categoryName: expenseCategories.name,
+      categoryColor: expenseCategories.color,
       notes: expenses.notes,
       expenseDate: expenses.expenseDate,
       splitMode: expenses.splitMode,
@@ -95,6 +111,7 @@ async function getExpenseQuery(
     })
     .from(expenses)
     .innerJoin(user, eq(user.id, expenses.paidBy))
+    .leftJoin(expenseCategories, eq(expenseCategories.id, expenses.categoryId))
     .where(
       and(
         eq(expenses.id, expenseId),

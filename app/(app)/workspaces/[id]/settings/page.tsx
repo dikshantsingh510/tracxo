@@ -62,6 +62,18 @@ export default async function WorkspaceSettingsPage({
             >
               Activity →
             </Link>
+            <Link
+              href={`/workspaces/${workspace.id}/settings/categories`}
+              className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
+            >
+              Categories →
+            </Link>
+            <Link
+              href={`/workspaces/${workspace.id}/recurring`}
+              className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
+            >
+              Recurring →
+            </Link>
           </div>
         }
       >

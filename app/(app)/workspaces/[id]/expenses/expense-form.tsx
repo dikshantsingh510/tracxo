@@ -12,6 +12,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 type Member = { userId: string; name: string; email: string };
+type Category = { id: string; name: string };
 type Mode = "equal" | "unequal" | "percentage" | "share" | "itemized";
 
 type Initial = {
@@ -21,6 +22,7 @@ type Initial = {
   amount: bigint;
   currency: string;
   category: string;
+  categoryId: string | null;
   notes: string;
   expenseDate: string;
   paidBy: string;
@@ -39,6 +41,7 @@ export function ExpenseForm(
         workspaceCurrency: string;
         actorUserId: string;
         members: Member[];
+        categories: Category[];
       }
     | {
         mode: "edit";
@@ -46,6 +49,7 @@ export function ExpenseForm(
         workspaceCurrency: string;
         actorUserId: string;
         members: Member[];
+        categories: Category[];
         initial: Initial;
       },
 ) {
@@ -62,7 +66,7 @@ export function ExpenseForm(
   const [expenseDate, setExpenseDate] = useState(
     initial?.expenseDate ?? new Date().toISOString().slice(0, 10),
   );
-  const [category, setCategory] = useState(initial?.category ?? "");
+  const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
   const [notes, setNotes] = useState(initial?.notes ?? "");
   const [splitMode, setSplitMode] = useState<Mode>(initial?.splitMode ?? "equal");
 
@@ -169,7 +173,8 @@ export function ExpenseForm(
           amount: totalMinor,
           currency,
           description: description.trim(),
-          category,
+          category: "",
+          categoryId: categoryId || undefined,
           notes,
           expenseDate,
           split,
@@ -183,7 +188,8 @@ export function ExpenseForm(
           amount: totalMinor,
           currency,
           description: description.trim(),
-          category,
+          category: "",
+          categoryId: categoryId || undefined,
           notes,
           expenseDate,
           split,
@@ -254,12 +260,18 @@ export function ExpenseForm(
       </div>
 
       <Field label="Category (optional)">
-        <Input
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          maxLength={50}
-          placeholder="Food, Travel, Rent…"
-        />
+        <select
+          className={SELECT_CLASS}
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+        >
+          <option value="">— Uncategorized —</option>
+          {props.categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
       </Field>
 
       <Field label="Split mode">

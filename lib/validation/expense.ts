@@ -76,7 +76,10 @@ export const splitInputSchema = z.discriminatedUnion("mode", [
 export type SplitInput = z.infer<typeof splitInputSchema>;
 
 const descriptionSchema = z.string().trim().min(1, "Description is required").max(200);
+// Legacy free-text category — kept for backwards compatibility with rows
+// created before the category table existed. New writes should use categoryId.
 const categorySchema = z.string().trim().max(50).optional().or(z.literal(""));
+const categoryIdSchema = z.string().optional().or(z.literal(""));
 const notesSchema = z.string().trim().max(2000).optional().or(z.literal(""));
 
 // Date as ISO YYYY-MM-DD — DB column is `date`, not `timestamp`.
@@ -89,6 +92,7 @@ export const createExpenseSchema = z.object({
   currency: currencyCodeSchema,
   description: descriptionSchema,
   category: categorySchema,
+  categoryId: categoryIdSchema,
   notes: notesSchema,
   expenseDate: expenseDateSchema,
   split: splitInputSchema,
@@ -106,6 +110,7 @@ export const updateExpenseSchema = z.object({
   currency: currencyCodeSchema,
   description: descriptionSchema,
   category: categorySchema,
+  categoryId: categoryIdSchema,
   notes: notesSchema,
   expenseDate: expenseDateSchema,
   split: splitInputSchema,

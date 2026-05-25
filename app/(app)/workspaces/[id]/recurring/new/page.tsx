@@ -5,13 +5,13 @@ import { getWorkspaceMembers } from "@/lib/queries/members";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExpenseForm } from "../expense-form";
+import { RecurringForm } from "../recurring-form";
 
-export const metadata = { title: "New expense · Tracxo" };
+export const metadata = { title: "New recurring expense · Tracxo" };
 
-export default async function NewExpensePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function NewRecurringPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const session = await requireSession(`/workspaces/${id}/expenses/new`);
+  const session = await requireSession(`/workspaces/${id}/recurring/new`);
   const workspace = await getWorkspaceById(id, session.user.id);
   if (!workspace) notFound();
   const members = await getWorkspaceMembers(workspace.id);
@@ -20,14 +20,16 @@ export default async function NewExpensePage({ params }: { params: Promise<{ id:
   return (
     <div className="mx-auto w-full max-w-2xl space-y-4">
       <Link
-        href={`/workspaces/${workspace.id}/expenses`}
+        href={`/workspaces/${workspace.id}/recurring`}
         className="inline-flex items-center text-emerald-700 text-sm underline-offset-4 hover:underline dark:text-emerald-400"
       >
-        ← Expenses
+        ← Recurring
       </Link>
-      <AuthCard title="New expense" description={`Split with members of ${workspace.name}`}>
-        <ExpenseForm
-          mode="create"
+      <AuthCard
+        title="New recurring expense"
+        description="Generates an expense on the schedule you set."
+      >
+        <RecurringForm
           workspaceId={workspace.id}
           workspaceCurrency={workspace.defaultCurrency}
           actorUserId={session.user.id}

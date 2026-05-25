@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel an older run for the same ref when a new commit lands — saves CI
+# minutes during rebases.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+# All jobs share the same setup steps (checkout, pnpm, node + install) so they
+# can run in parallel. Keep them tightly scoped — a single `pnpm install`
+# happens per job, but it's cached by the pnpm store key.
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '11.1.2'
+
+jobs:
+  lint:
+    name: Lint (Biome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+
+  typecheck:
+    name: Typecheck (tsc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  test:
+    name: Test (vitest, unit only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Integration tests require DATABASE_URL_TEST + a Neon test branch and
+      # TRUNCATE every table before each test — running them concurrently in
+      # CI would corrupt the shared DB. Run only the `unit` project here;
+      # revisit when we have per-PR ephemeral Neon branches.
+      - run: pnpm test:unit
+
+  build:
+    name: Build (Next.js)
+    runs-on: ubuntu-latest
+    env:
+      # The Next build instantiates lib/db/client which reads DATABASE_URL at
+      # module load time. Production builds on Vercel get the real value;
+      # CI just needs any well-formed connection string so the import doesn't
+      # crash during the static-analysis pass.
+      DATABASE_URL: postgres://ci:ci@localhost:5432/ci?sslmode=disable
+      BETTER_AUTH_SECRET: ci-placeholder-secret-not-used-at-build-time-1234567890
+      BETTER_AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build

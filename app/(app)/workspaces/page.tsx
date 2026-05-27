@@ -1,9 +1,61 @@
-import { requireSession } from "@/lib/auth/server";
-import { getUserWorkspaces } from "@/lib/queries/workspaces";
+import { FolderPlus, Plus, Users } from "lucide-react";
 import Link from "next/link";
-import { SignOutButton } from "./sign-out-button";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { RoleBadge } from "@/components/ui/role-badge";
+import { requireSession } from "@/lib/auth/server";
+import { type UserWorkspace, getUserWorkspaces } from "@/lib/queries/workspaces";
+import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Workspaces · Tracxo" };
+
+function workspaceInitial(ws: UserWorkspace): string {
+  if (ws.icon) return ws.icon;
+  return ws.name[0]?.toUpperCase() ?? "?";
+}
+
+function WorkspaceCard({ workspace }: { workspace: UserWorkspace }) {
+  const archived = workspace.status === "archived";
+  return (
+    <Link
+      href={`/workspaces/${workspace.id}/expenses`}
+      className={cn(
+        "surface-acrylic-light group block rounded-2xl p-5 transition-all duration-200",
+        "@media (hover: hover) and (pointer: fine) hover:-translate-y-0.5 hover:shadow-md",
+        "active:scale-[0.99]",
+        archived && "opacity-70",
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3 min-w-0">
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 font-semibold text-base text-white shadow-sm">
+            {workspaceInitial(workspace)}
+          </span>
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-foreground">{workspace.name}</p>
+            <p className="mt-0.5 text-muted-foreground text-xs">
+              <span className="capitalize">{workspace.type}</span>
+              <span aria-hidden> · </span>
+              <span>{workspace.defaultCurrency}</span>
+            </p>
+          </div>
+        </div>
+        {archived ? (
+          <Badge variant="neutral">Archived</Badge>
+        ) : (
+          <RoleBadge role={workspace.role} size="xs" />
+        )}
+      </div>
+      <div className="mt-4 flex items-center gap-1.5 border-border border-t pt-3 text-muted-foreground text-xs">
+        <Users className="size-3.5" strokeWidth={1.75} aria-hidden />
+        Open workspace
+        <span className="ml-auto opacity-0 transition-opacity group-hover:opacity-100">→</span>
+      </div>
+    </Link>
+  );
+}
 
 export default async function WorkspacesPage() {
   const session = await requireSession("/workspaces");
@@ -13,101 +65,66 @@ export default async function WorkspacesPage() {
   const archived = workspaces.filter((w) => w.status === "archived");
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <header className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="font-semibold text-2xl text-slate-900 tracking-tight dark:text-slate-50">
+          <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">
             Workspaces
           </h1>
-          <p className="mt-1 text-slate-600 text-sm dark:text-slate-400">
-            Signed in as {session.user.email}
+          <p className="mt-1 text-muted-foreground text-sm">
+            {active.length} active
+            {archived.length > 0 ? ` · ${archived.length} archived` : ""}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/workspaces/new"
-            className="inline-flex h-9 items-center justify-center rounded-md bg-emerald-600 px-4 font-medium text-sm text-white shadow-sm transition hover:bg-emerald-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950"
-          >
-            New workspace
-          </Link>
-          <SignOutButton />
-        </div>
+        <Button
+          nativeButton={false}
+          render={
+            <Link href="/workspaces/new">
+              <Plus className="size-4" strokeWidth={2} aria-hidden />
+              New workspace
+            </Link>
+          }
+        />
       </header>
 
       <section>
-        <h2 className="mb-3 font-medium text-slate-500 text-xs uppercase tracking-wider dark:text-slate-400">
-          Active
-        </h2>
         {active.length === 0 ? (
-          <EmptyCard>
-            No active workspaces. Personal workspace should bootstrap on signup — if missing, try
-            creating one.
-          </EmptyCard>
+          <EmptyState
+            icon={FolderPlus}
+            heading="No workspaces yet"
+            body="Create one to start splitting expenses with your friends, flatmates, or travel crew."
+            cta={{ label: "Create your first workspace", href: "/workspaces/new" }}
+          />
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {active.map((w) => (
-              <WorkspaceRow key={w.id} workspace={w} />
-            ))}
-          </ul>
+          <>
+            <h2 className="mb-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">
+              Active
+            </h2>
+            <ul className="stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {active.map((w) => (
+                <li key={w.id}>
+                  <WorkspaceCard workspace={w} />
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </section>
 
-      {archived.length > 0 && (
+      {archived.length > 0 ? (
         <section>
-          <h2 className="mb-3 font-medium text-slate-500 text-xs uppercase tracking-wider dark:text-slate-400">
+          <h2 className="mb-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">
             Archived
           </h2>
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {archived.map((w) => (
-              <WorkspaceRow key={w.id} workspace={w} />
+              <li key={w.id}>
+                <WorkspaceCard workspace={w} />
+              </li>
             ))}
           </ul>
         </section>
-      )}
+      ) : null}
     </div>
-  );
-}
-
-function EmptyCard({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="surface-acrylic-light rounded-xl p-6 text-slate-600 text-sm dark:text-slate-400">
-      {children}
-    </div>
-  );
-}
-
-function WorkspaceRow({
-  workspace,
-}: {
-  workspace: Awaited<ReturnType<typeof getUserWorkspaces>>[number];
-}) {
-  return (
-    <li>
-      <Link
-        href={`/workspaces/${workspace.id}/settings`}
-        className="surface-acrylic-light block rounded-xl p-4 transition hover:ring-1 hover:ring-emerald-500/30"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="truncate font-medium text-slate-900 dark:text-slate-50">
-              {workspace.icon ? `${workspace.icon} ` : ""}
-              {workspace.name}
-            </div>
-            <div className="mt-1 flex items-center gap-2 text-slate-500 text-xs dark:text-slate-400">
-              <span className="capitalize">{workspace.type}</span>
-              <span aria-hidden>·</span>
-              <span>{workspace.defaultCurrency}</span>
-              <span aria-hidden>·</span>
-              <span className="capitalize">{workspace.role}</span>
-            </div>
-          </div>
-          {workspace.status === "archived" && (
-            <span className="inline-flex shrink-0 items-center rounded-full bg-slate-200/60 px-2 py-0.5 font-medium text-slate-700 text-xs dark:bg-slate-800/60 dark:text-slate-300">
-              archived
-            </span>
-          )}
-        </div>
-      </Link>
-    </li>
   );
 }

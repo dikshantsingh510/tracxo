@@ -56,7 +56,11 @@ export function FeedbackWidget() {
   }
 
   return (
-    <div ref={panelRef} className="fixed right-4 bottom-4 z-30 sm:right-6 sm:bottom-6">
+    <div
+      ref={panelRef}
+      className="fixed right-4 bottom-4 sm:right-6 sm:bottom-6"
+      style={{ zIndex: "var(--z-toast)" }}
+    >
       {open && (
         <div className="surface-acrylic-heavy mb-3 w-80 rounded-xl border border-slate-200/60 p-4 shadow-xl dark:border-slate-800/60">
           <h3 className="font-semibold text-slate-900 text-sm dark:text-slate-50">

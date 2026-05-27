@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowRight, Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -51,7 +53,12 @@ export function ResetForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>New password</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  className="h-11 rounded-xl"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>At least 8 characters, with a letter and a number.</FormDescription>
               <FormMessage />
@@ -65,14 +72,37 @@ export function ResetForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>Confirm password</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  className="h-11 rounded-xl"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? "Saving…" : "Reset password"}
+        <Button
+          type="submit"
+          size="lg"
+          className="group h-11 w-full rounded-xl text-base font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/20"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Saving…
+            </>
+          ) : (
+            <>
+              Reset password
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={2}
+              />
+            </>
+          )}
         </Button>
       </form>
     </Form>

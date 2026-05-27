@@ -96,6 +96,14 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Decorative wordmark — Vercel/Linear pattern. Tightly tracked, edge-bleed.
+          Uses gradient mask so it fades at the top, anchored to the bottom edge. */}
+      <div aria-hidden className="-mb-2 sm:-mb-4 relative overflow-hidden px-2 pt-4 sm:px-4">
+        <p className="select-none bg-gradient-to-b from-foreground/[0.10] to-foreground/[0.02] bg-clip-text text-center font-bold text-transparent text-[clamp(4rem,18vw,16rem)] leading-[0.85] tracking-[-0.06em] dark:from-foreground/[0.12] dark:to-foreground/[0.02]">
+          Tracxo
+        </p>
+      </div>
     </footer>
   );
 }

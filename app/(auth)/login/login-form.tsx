@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowRight, Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -61,7 +63,13 @@ export function LoginForm({ next }: { next: string }) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" autoComplete="email" placeholder="you@example.com" {...field} />
+                <Input
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className="h-11 rounded-xl"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,20 +84,43 @@ export function LoginForm({ next }: { next: string }) {
                 <FormLabel>Password</FormLabel>
                 <Link
                   href="/forgot-password"
-                  className="text-slate-600 text-xs hover:underline dark:text-slate-400"
+                  className="text-muted-foreground text-xs underline-offset-4 hover:text-foreground hover:underline"
                 >
                   Forgot?
                 </Link>
               </div>
               <FormControl>
-                <Input type="password" autoComplete="current-password" {...field} />
+                <Input
+                  type="password"
+                  autoComplete="current-password"
+                  className="h-11 rounded-xl"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? "Signing in…" : "Sign in"}
+        <Button
+          type="submit"
+          size="lg"
+          className="group h-11 w-full rounded-xl text-base font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/20"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Signing in…
+            </>
+          ) : (
+            <>
+              Sign in
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={2}
+              />
+            </>
+          )}
         </Button>
       </form>
     </Form>

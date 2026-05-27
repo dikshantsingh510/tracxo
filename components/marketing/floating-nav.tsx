@@ -91,12 +91,13 @@ export function FloatingNav() {
       </motion.div>
 
       <MobileDrawer open={open} onOpenChange={setOpen} title="Menu">
-        <nav className="flex flex-col gap-2">
+        <nav className="flex flex-col gap-1.5">
           {LINKS.map((l) => (
             <Button
               key={l.href}
               variant="ghost"
-              className="justify-start"
+              size="lg"
+              className="h-12 justify-start rounded-2xl px-4 text-base"
               render={
                 <a href={l.href} onClick={() => setOpen(false)}>
                   {l.label}
@@ -104,9 +105,11 @@ export function FloatingNav() {
               }
             />
           ))}
-          <hr className="my-1 border-border" />
+          <hr className="my-2 border-border" />
           <Button
             variant="outline"
+            size="lg"
+            className="h-12 rounded-2xl text-base"
             render={
               <Link href="/login" onClick={() => setOpen(false)}>
                 Sign in
@@ -114,6 +117,8 @@ export function FloatingNav() {
             }
           />
           <Button
+            size="lg"
+            className="h-12 rounded-2xl text-base"
             render={
               <Link href="/signup" onClick={() => setOpen(false)}>
                 Open app
@@ -124,7 +129,7 @@ export function FloatingNav() {
         <Button
           variant="ghost"
           size="icon-sm"
-          className="absolute top-3 right-3"
+          className="absolute top-3 right-3 rounded-full"
           onClick={() => setOpen(false)}
           aria-label="Close menu"
         >

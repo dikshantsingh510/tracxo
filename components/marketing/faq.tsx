@@ -53,7 +53,7 @@ export function Faq() {
         </h2>
       </SectionReveal>
       <SectionReveal delay={0.1}>
-        <Accordion className="grid gap-3 sm:grid-cols-2">
+        <Accordion className="grid auto-rows-min items-start gap-3 sm:grid-cols-2">
           {FAQS.map((item) => (
             <AccordionItem key={item.q} value={item.q}>
               <AccordionTrigger>{item.q}</AccordionTrigger>

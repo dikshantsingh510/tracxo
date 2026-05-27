@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
 
@@ -76,39 +76,57 @@ export function Pricing() {
       </SectionReveal>
 
       <SectionReveal delay={0.15}>
-        <div className="mt-8 text-center">
-          <p className="font-medium text-foreground text-sm">Want early access to Pro?</p>
-          <p className="mt-1 text-muted-foreground text-xs">
-            Advanced analytics, exports, custom currencies. Drop your email.
-          </p>
-          {submitted ? (
-            <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-emerald-700 text-sm dark:bg-emerald-900/40 dark:text-emerald-300">
-              <Check className="size-4" strokeWidth={2.5} aria-hidden />
-              You&rsquo;re on the list.
-            </p>
-          ) : (
-            <form
-              onSubmit={handleWaitlist}
-              className="mx-auto mt-4 flex max-w-md flex-col gap-2 sm:flex-row"
-            >
-              <Input
-                type="email"
-                required
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1"
-              />
-              <Button type="submit">Join waitlist</Button>
-            </form>
-          )}
-          <p className="mt-3 text-muted-foreground text-xs">
-            Or{" "}
-            <Link href="/signup" className="underline-offset-4 hover:underline">
-              start with free
-            </Link>{" "}
-            and we&rsquo;ll let you know.
-          </p>
+        <div className="surface-acrylic-light mt-8 overflow-hidden rounded-2xl p-6 sm:p-8">
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
+              <Sparkles className="size-6" strokeWidth={1.75} aria-hidden />
+            </span>
+            <div className="flex-1 space-y-4 text-center sm:text-left">
+              <div>
+                <p className="font-semibold text-foreground text-lg tracking-tight">
+                  Want early access to{" "}
+                  <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-300">
+                    Tracxo Pro
+                  </span>
+                  ?
+                </p>
+                <p className="mt-1 text-muted-foreground text-sm">
+                  Advanced analytics, exports, custom currencies. Drop your email — we&rsquo;ll ping
+                  you when it&rsquo;s live.
+                </p>
+              </div>
+              {submitted ? (
+                <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 font-medium text-emerald-700 text-sm dark:bg-emerald-900/40 dark:text-emerald-300">
+                  <Check className="size-4" strokeWidth={2.5} aria-hidden />
+                  You&rsquo;re on the list.
+                </p>
+              ) : (
+                <form onSubmit={handleWaitlist} className="flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-11 flex-1"
+                  />
+                  <Button type="submit" size="lg" className="h-11">
+                    Join waitlist
+                  </Button>
+                </form>
+              )}
+              <p className="text-muted-foreground text-xs">
+                Or{" "}
+                <Link
+                  href="/signup"
+                  className="text-foreground underline underline-offset-4 hover:text-emerald-700 dark:hover:text-emerald-400"
+                >
+                  start with free
+                </Link>{" "}
+                and we&rsquo;ll let you know.
+              </p>
+            </div>
+          </div>
         </div>
       </SectionReveal>
     </section>

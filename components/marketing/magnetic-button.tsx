@@ -4,9 +4,9 @@ import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/reac
 import Link from "next/link";
 import { type MouseEvent, type ReactNode, useRef } from "react";
 
-import { Button, buttonVariants } from "@/components/ui/button";
-import type { VariantProps } from "class-variance-authority";
+import { Button, type buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { VariantProps } from "class-variance-authority";
 
 // Per emil-design-eng §Spring-based mouse interactions. The button tracks
 // the cursor with a damped spring so it leans slightly toward the pointer

@@ -27,8 +27,11 @@ export function TrustStrip() {
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-background to-transparent" />
         <div className="flex w-max items-center gap-12 animate-marquee whitespace-nowrap text-muted-foreground text-sm">
           {/* Doubled so the loop is seamless at -50% translate */}
-          {[...NAMES, ...NAMES].map((n, i) => (
-            <span key={`${n}-${i}`} className="font-medium tracking-tight">
+          {[
+            ...NAMES.map((n) => ({ n, k: `a-${n}` })),
+            ...NAMES.map((n) => ({ n, k: `b-${n}` })),
+          ].map(({ n, k }) => (
+            <span key={k} className="font-medium tracking-tight">
               · {n}
             </span>
           ))}

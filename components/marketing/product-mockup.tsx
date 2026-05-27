@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import { Check } from "lucide-react";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import { useRef } from "react";
 
 import { Money } from "@/components/ui/money";
@@ -112,13 +112,17 @@ export function ProductMockup({ className }: { className?: string }) {
         aria-hidden
         animate={reduce ? undefined : { y: [0, -6, 0] }}
         transition={
-          reduce
-            ? undefined
-            : { duration: 3, ease: "easeInOut", repeat: Number.POSITIVE_INFINITY }
+          reduce ? undefined : { duration: 3, ease: "easeInOut", repeat: Number.POSITIVE_INFINITY }
         }
         className="-top-3 -right-3 absolute inline-flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1 font-medium text-white text-xs shadow-lg dark:bg-emerald-400 dark:text-emerald-950"
       >
-        +<Money amount={82000n} currency="INR" tone="plain" className="text-white dark:text-emerald-950" />
+        +
+        <Money
+          amount={82000n}
+          currency="INR"
+          tone="plain"
+          className="text-white dark:text-emerald-950"
+        />
       </motion.div>
     </motion.div>
   );

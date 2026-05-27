@@ -1,13 +1,12 @@
 "use client";
 
 import {
-  Calendar,
   Check,
   CircleDollarSign,
   History,
+  type LucideIcon,
   Repeat2,
   Smartphone,
-  type LucideIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -120,9 +119,7 @@ function PhoneMockup() {
             <Smartphone className="size-3.5" strokeWidth={2} />
             Open UPI
           </button>
-          <p className="text-center text-[10px] text-muted-foreground">
-            One tap to your bank app
-          </p>
+          <p className="text-center text-[10px] text-muted-foreground">One tap to your bank app</p>
         </div>
       </div>
     </div>
@@ -137,14 +134,16 @@ function CurrencyDrift() {
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[var(--surface-light-bg)] to-transparent" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[var(--surface-light-bg)] to-transparent" />
       <div className="flex w-max items-center gap-3 animate-marquee">
-        {[...codes, ...codes].map((c, i) => (
-          <span
-            key={`${c}-${i}`}
-            className="grid size-10 place-items-center rounded-full bg-background font-semibold text-foreground text-xs ring-1 ring-border"
-          >
-            {c}
-          </span>
-        ))}
+        {[...codes.map((c) => ({ c, k: `a-${c}` })), ...codes.map((c) => ({ c, k: `b-${c}` }))].map(
+          ({ c, k }) => (
+            <span
+              key={k}
+              className="grid size-10 place-items-center rounded-full bg-background font-semibold text-foreground text-xs ring-1 ring-border"
+            >
+              {c}
+            </span>
+          ),
+        )}
       </div>
     </div>
   );
@@ -180,8 +179,11 @@ function ActivitySnippet() {
   ];
   return (
     <ul className="flex flex-col gap-2 text-sm">
-      {rows.map((r, i) => (
-        <li key={i} className="flex items-center gap-2 rounded-md bg-background/60 px-3 py-2">
+      {rows.map((r) => (
+        <li
+          key={`${r.who}-${r.what}`}
+          className="flex items-center gap-2 rounded-md bg-background/60 px-3 py-2"
+        >
           <span className="grid size-6 place-items-center rounded-full bg-emerald-100 font-medium text-[10px] text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
             {r.who[0]}
           </span>

@@ -31,11 +31,13 @@ function Connector() {
   return (
     <svg
       ref={ref}
-      aria-hidden
+      aria-hidden="true"
+      focusable="false"
       viewBox="0 0 600 12"
       preserveAspectRatio="none"
       className="absolute top-1/2 left-0 hidden h-3 w-full -translate-y-1/2 lg:block"
     >
+      <title>Decorative connector between steps</title>
       <motion.line
         x1="40"
         y1="6"
@@ -55,10 +57,7 @@ function Connector() {
 
 export function HowItWorks() {
   return (
-    <section
-      id="how-it-works"
-      className="mx-auto w-full max-w-6xl px-6 py-24 sm:px-8"
-    >
+    <section id="how-it-works" className="mx-auto w-full max-w-6xl px-6 py-24 sm:px-8">
       <SectionReveal className="mx-auto mb-16 max-w-2xl text-center">
         <p className="font-medium text-emerald-700 text-xs uppercase tracking-[0.18em] dark:text-emerald-400">
           How it works

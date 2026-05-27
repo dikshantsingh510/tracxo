@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { AnimatedMeshBg } from "@/components/marketing/animated-mesh-bg";
 import { MagneticButton } from "@/components/marketing/magnetic-button";
 import { ProductMockup } from "@/components/marketing/product-mockup";
@@ -34,7 +32,11 @@ export function Hero() {
             <MagneticButton href="/signup" size="lg">
               Get started — it&rsquo;s free
             </MagneticButton>
-            <Button variant="ghost" size="lg" render={<a href="#how-it-works">See how it works</a>} />
+            <Button
+              variant="ghost"
+              size="lg"
+              render={<a href="#how-it-works">See how it works</a>}
+            />
           </div>
           <p className="text-muted-foreground text-sm">
             Free forever for groups under 10. No card required.

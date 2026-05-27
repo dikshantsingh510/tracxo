@@ -25,9 +25,7 @@ export function SectionReveal({ children, className, delay = 0, distance = 12 }:
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={
-        reduce
-          ? { duration: 0.2, delay }
-          : { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }
+        reduce ? { duration: 0.2, delay } : { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }
       }
     >
       {children}

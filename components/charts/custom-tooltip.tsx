@@ -1,6 +1,7 @@
 "use client";
 
 import type { TooltipContentProps } from "recharts";
+import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 import { Money } from "@/components/ui/money";
 import { cn } from "@/lib/utils";
@@ -12,7 +13,7 @@ import { cn } from "@/lib/utils";
 // Accepts an optional `currency` so analytics tooltips can format properly.
 // Recharts feeds us `payload` items, each with `name`, `value`, `color`.
 
-type Props = TooltipContentProps<number, string> & {
+type Props = TooltipContentProps<ValueType, NameType> & {
   currency?: string;
 };
 

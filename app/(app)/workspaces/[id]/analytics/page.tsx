@@ -1,10 +1,12 @@
-import { AuthCard } from "@/components/auth/auth-card";
+import { BarChart3, Download } from "lucide-react";
+import { notFound } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Money } from "@/components/ui/money";
 import { requireSession } from "@/lib/auth/server";
-import { formatMoney } from "@/lib/money";
 import { getCategoryTotals, getMonthTotals, getPayerTotals } from "@/lib/queries/analytics";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { AnalyticsCharts } from "./charts";
 
 export const metadata = { title: "Analytics · Tracxo" };
@@ -21,25 +23,57 @@ export default async function AnalyticsPage({ params }: { params: Promise<{ id: 
     getPayerTotals(workspace.id),
   ]);
 
-  const grandTotal = byCategory.reduce((s, r) => s + r.totalMinor, 0n);
+  const grandTotalMinor = byCategory.reduce((s, r) => s + r.totalMinor, 0n);
+  const totalCount = byCategory.reduce((s, r) => s + r.count, 0);
+  const isEmpty = byCategory.length === 0 && byMonth.length === 0 && byPayer.length === 0;
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
-      <Link
-        href={`/workspaces/${workspace.id}/settings`}
-        className="inline-flex items-center text-emerald-700 text-sm underline-offset-4 hover:underline dark:text-emerald-400"
-      >
-        ← Workspace settings
-      </Link>
+    <div className="space-y-6">
+      <header className="flex items-end justify-between gap-4">
+        <div>
+          <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">Analytics</h1>
+          <p className="mt-1 text-muted-foreground text-sm">
+            {isEmpty ? (
+              <>Insights for {workspace.name}.</>
+            ) : (
+              <>
+                Total{" "}
+                <Money
+                  amount={grandTotalMinor}
+                  currency={workspace.defaultCurrency}
+                  tone="plain"
+                  className="font-medium text-foreground"
+                />{" "}
+                across {totalCount} expense{totalCount === 1 ? "" : "s"}.
+              </>
+            )}
+          </p>
+        </div>
+        {!isEmpty ? (
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={
+              <a href={`/api/workspaces/${workspace.id}/export`}>
+                <Download className="size-4" strokeWidth={1.75} aria-hidden />
+                Export CSV
+              </a>
+            }
+          />
+        ) : null}
+      </header>
 
-      <AuthCard
-        title="Analytics"
-        description={
-          byCategory.length === 0
-            ? "No expenses yet."
-            : `Total ${formatMoney(grandTotal, workspace.defaultCurrency)} across ${byCategory.reduce((s, r) => s + r.count, 0)} expenses.`
-        }
-      >
+      {isEmpty ? (
+        <EmptyState
+          icon={BarChart3}
+          heading="No data yet"
+          body="Add expenses to start seeing breakdowns by category, month, and payer."
+          cta={{
+            label: "Add first expense",
+            href: `/workspaces/${workspace.id}/expenses/new`,
+          }}
+        />
+      ) : (
         <AnalyticsCharts
           currency={workspace.defaultCurrency}
           byCategory={byCategory.map((c) => ({
@@ -59,19 +93,7 @@ export default async function AnalyticsPage({ params }: { params: Promise<{ id: 
             count: p.count,
           }))}
         />
-
-        <div className="mt-6 border-slate-200/60 border-t pt-4 dark:border-slate-800/60">
-          <h3 className="mb-2 font-medium text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
-            Export
-          </h3>
-          <a
-            href={`/api/workspaces/${workspace.id}/export`}
-            className="inline-block rounded-md border border-input bg-transparent px-3 py-1.5 text-sm shadow-xs hover:bg-slate-100 dark:hover:bg-slate-900"
-          >
-            Download all expenses (CSV)
-          </a>
-        </div>
-      </AuthCard>
+      )}
     </div>
   );
 }

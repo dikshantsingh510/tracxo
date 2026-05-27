@@ -1,11 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { softDeleteExpense } from "@/lib/actions/expenses";
+import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { softDeleteExpense } from "@/lib/actions/expenses";
 
 export function ExpenseActions({
   workspaceId,
@@ -17,11 +20,9 @@ export function ExpenseActions({
   editHref: string;
 }) {
   const router = useRouter();
-  const [pending, setPending] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
-  async function onDelete() {
-    if (!confirm("Delete this expense? This cannot be undone.")) return;
-    setPending(true);
+  async function onConfirmDelete() {
     try {
       await softDeleteExpense({ id: expenseId, workspaceId });
       toast.success("Expense deleted");
@@ -29,21 +30,38 @@ export function ExpenseActions({
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not delete");
-      setPending(false);
+      throw err; // keep dialog open on error
     }
   }
 
   return (
-    <div className="flex items-center justify-between gap-2">
-      <Link
-        href={editHref}
-        className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
-      >
-        Edit
-      </Link>
-      <Button type="button" size="sm" variant="destructive" disabled={pending} onClick={onDelete}>
-        {pending ? "Deleting…" : "Delete"}
-      </Button>
-    </div>
+    <>
+      <div className="flex items-center justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={
+            <Link href={editHref}>
+              <Pencil className="size-3.5" strokeWidth={1.75} aria-hidden />
+              Edit
+            </Link>
+          }
+        />
+        <Button type="button" size="sm" variant="destructive" onClick={() => setConfirmOpen(true)}>
+          <Trash2 className="size-3.5" strokeWidth={1.75} aria-hidden />
+          Delete
+        </Button>
+      </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete this expense?"
+        description="This cannot be undone. Settlements that reference this expense will still keep their history."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={onConfirmDelete}
+      />
+    </>
   );
 }

@@ -2,12 +2,24 @@ import { Sidebar } from "@/components/app-shell/sidebar";
 import { Topbar } from "@/components/app-shell/topbar";
 import { getSession } from "@/lib/auth/server";
 import { countUnreadNotifications, listRecentNotifications } from "@/lib/queries/notifications";
-import { getUserWorkspaces } from "@/lib/queries/workspaces";
+import { type UserWorkspace, getUserWorkspaces } from "@/lib/queries/workspaces";
 import { FeedbackWidget } from "./feedback-widget";
 
 // Authenticated app shell. Grid: [sidebar 280px][content]. Topbar lives
 // inside the content column so the sidebar can scroll independently.
 // Mobile: sidebar collapses into the Topbar's Vaul drawer.
+//
+// Each query is independent. A missing table (e.g. notifications) shouldn't
+// crash the whole shell — fall back to safe defaults and log.
+async function safe<T>(p: Promise<T>, fallback: T, label: string): Promise<T> {
+  try {
+    return await p;
+  } catch (e) {
+    console.warn(`[AppLayout] ${label} failed:`, e instanceof Error ? e.message : e);
+    return fallback;
+  }
+}
+
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   // proxy.ts gates this route group for anonymous users; the session check
@@ -17,9 +29,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   const [workspaces, unread, recent] = await Promise.all([
-    getUserWorkspaces(session.user.id),
-    countUnreadNotifications(session.user.id),
-    listRecentNotifications(session.user.id, 10),
+    safe<UserWorkspace[]>(getUserWorkspaces(session.user.id), [], "getUserWorkspaces"),
+    safe(countUnreadNotifications(session.user.id), 0, "countUnreadNotifications"),
+    safe(listRecentNotifications(session.user.id, 10), [], "listRecentNotifications"),
   ]);
 
   const bellItems = recent.map((r) => ({

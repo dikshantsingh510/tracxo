@@ -58,6 +58,7 @@ export function FloatingNav() {
                 key={l.href}
                 variant="ghost"
                 size="sm"
+                nativeButton={false}
                 render={<a href={l.href}>{l.label}</a>}
               />
             ))}
@@ -66,6 +67,7 @@ export function FloatingNav() {
             <Button
               variant="ghost"
               size="sm"
+              nativeButton={false}
               className="hidden sm:inline-flex"
               render={<Link href="/login">Sign in</Link>}
             />
@@ -97,6 +99,7 @@ export function FloatingNav() {
               key={l.href}
               variant="ghost"
               size="lg"
+              nativeButton={false}
               className="h-12 justify-start rounded-2xl px-4 text-base"
               render={
                 <a href={l.href} onClick={() => setOpen(false)}>
@@ -109,6 +112,7 @@ export function FloatingNav() {
           <Button
             variant="outline"
             size="lg"
+            nativeButton={false}
             className="h-12 rounded-2xl text-base"
             render={
               <Link href="/login" onClick={() => setOpen(false)}>
@@ -118,6 +122,7 @@ export function FloatingNav() {
           />
           <Button
             size="lg"
+            nativeButton={false}
             className="h-12 rounded-2xl text-base"
             render={
               <Link href="/signup" onClick={() => setOpen(false)}>

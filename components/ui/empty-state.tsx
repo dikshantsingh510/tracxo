@@ -60,7 +60,7 @@ export function EmptyState({
       </div>
       {cta ? (
         cta.href ? (
-          <Button render={<Link href={cta.href}>{cta.label}</Link>} />
+          <Button nativeButton={false} render={<Link href={cta.href}>{cta.label}</Link>} />
         ) : (
           <Button onClick={cta.onClick}>{cta.label}</Button>
         )

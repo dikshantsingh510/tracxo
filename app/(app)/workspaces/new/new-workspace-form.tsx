@@ -1,5 +1,12 @@
 "use client";
 
+import { ArrowRight, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -10,13 +17,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createWorkspace } from "@/lib/actions/workspaces";
 import { type CreateWorkspaceInput, createWorkspaceSchema } from "@/lib/validation/workspace";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 export function NewWorkspaceForm({ currencies }: { currencies: string[] }) {
   const router = useRouter();
@@ -32,7 +41,7 @@ export function NewWorkspaceForm({ currencies }: { currencies: string[] }) {
     try {
       const { id } = await createWorkspace(values);
       toast.success("Workspace created");
-      router.push(`/workspaces/${id}/settings`);
+      router.push(`/workspaces/${id}/expenses`);
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create workspace");
@@ -54,6 +63,7 @@ export function NewWorkspaceForm({ currencies }: { currencies: string[] }) {
                   autoFocus
                   placeholder="Goa Trip, Apartment 3B…"
                   autoComplete="off"
+                  className="h-11 rounded-xl"
                   {...field}
                 />
               </FormControl>
@@ -72,6 +82,7 @@ export function NewWorkspaceForm({ currencies }: { currencies: string[] }) {
                   placeholder="🏖️"
                   maxLength={64}
                   autoComplete="off"
+                  className="h-11 rounded-xl"
                   {...field}
                   value={field.value ?? ""}
                 />
@@ -87,23 +98,43 @@ export function NewWorkspaceForm({ currencies }: { currencies: string[] }) {
             <FormItem>
               <FormLabel>Default currency</FormLabel>
               <FormControl>
-                <select
-                  {...field}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {currencies.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="h-11 w-full rounded-xl">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currencies.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? "Creating…" : "Create workspace"}
+        <Button
+          type="submit"
+          size="lg"
+          className="group h-11 w-full rounded-xl text-base font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/20"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Creating…
+            </>
+          ) : (
+            <>
+              Create workspace
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={2}
+              />
+            </>
+          )}
         </Button>
       </form>
     </Form>

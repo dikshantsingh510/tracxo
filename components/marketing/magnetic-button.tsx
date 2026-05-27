@@ -74,6 +74,7 @@ export function MagneticButton({
         <Button
           variant={variant}
           size={size}
+          nativeButton={false}
           className={cn("relative", className)}
           render={<Link href={href}>{children}</Link>}
         />

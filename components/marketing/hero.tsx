@@ -35,6 +35,7 @@ export function Hero() {
             <Button
               variant="ghost"
               size="lg"
+              nativeButton={false}
               render={<a href="#how-it-works">See how it works</a>}
             />
           </div>

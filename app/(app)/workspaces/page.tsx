@@ -68,9 +68,7 @@ export default async function WorkspacesPage() {
     <div className="space-y-10">
       <header className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">
-            Workspaces
-          </h1>
+          <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">Workspaces</h1>
           <p className="mt-1 text-muted-foreground text-sm">
             {active.length} active
             {archived.length > 0 ? ` · ${archived.length} archived` : ""}

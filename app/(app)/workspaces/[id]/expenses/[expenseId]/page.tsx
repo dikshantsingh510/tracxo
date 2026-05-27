@@ -1,14 +1,16 @@
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
 import { AuthCard } from "@/components/auth/auth-card";
+import { Money } from "@/components/ui/money";
 import { requireSession } from "@/lib/auth/server";
-import { formatMoney } from "@/lib/money";
 import { listAttachments } from "@/lib/queries/attachments";
 import { listCategories } from "@/lib/queries/categories";
 import { listComments } from "@/lib/queries/comments";
 import { getExpense, getMembershipRole } from "@/lib/queries/expenses";
 import { getWorkspaceMembers } from "@/lib/queries/members";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ExpenseForm } from "../expense-form";
 import { AttachmentsSection } from "./attachments-section";
 import { CommentsThread } from "./comments-thread";
@@ -42,9 +44,10 @@ export default async function ExpenseDetailPage({
       <div className="mx-auto w-full max-w-2xl space-y-4">
         <Link
           href={`/workspaces/${workspace.id}/expenses/${expense.id}`}
-          className="inline-flex items-center text-emerald-700 text-sm underline-offset-4 hover:underline dark:text-emerald-400"
+          className="inline-flex items-center gap-1 text-muted-foreground text-sm transition-colors hover:text-foreground"
         >
-          ← Back to expense
+          <ChevronLeft className="size-4" strokeWidth={1.75} />
+          Back to expense
         </Link>
         <AuthCard title="Edit expense">
           <ExpenseForm
@@ -84,105 +87,104 @@ export default async function ExpenseDetailPage({
   ]);
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4">
+    <div className="mx-auto w-full max-w-2xl space-y-6">
       <Link
         href={`/workspaces/${workspace.id}/expenses`}
-        className="inline-flex items-center text-emerald-700 text-sm underline-offset-4 hover:underline dark:text-emerald-400"
+        className="inline-flex items-center gap-1 text-muted-foreground text-sm transition-colors hover:text-foreground"
       >
-        ← Expenses
+        <ChevronLeft className="size-4" strokeWidth={1.75} />
+        Expenses
       </Link>
 
-      <AuthCard
-        title={expense.description}
-        description={`${expense.payerName} paid · ${expense.expenseDate} · ${expense.splitMode}`}
-        footer={
-          <ExpenseActions
-            workspaceId={workspace.id}
-            expenseId={expense.id}
-            editHref={`/workspaces/${workspace.id}/expenses/${expense.id}?edit=1`}
-          />
-        }
-      >
-        <div className="space-y-4">
-          <div className="text-center">
-            <div className="font-semibold text-3xl text-emerald-700 tracking-tight dark:text-emerald-400">
-              {formatMoney(expense.amount, expense.currency)}
-            </div>
-            {(expense.categoryName || expense.category) && (
-              <div className="mt-1.5">
-                <span
-                  className="inline-block rounded-full px-2 py-0.5 text-xs"
-                  style={
-                    expense.categoryColor
-                      ? {
-                          backgroundColor: `${expense.categoryColor}1a`,
-                          color: expense.categoryColor,
-                        }
-                      : undefined
+      {/* Hero amount card */}
+      <section className="surface-acrylic-light rounded-2xl p-6 text-center sm:p-8">
+        <p className="text-muted-foreground text-xs uppercase tracking-wider">
+          {expense.payerName} paid
+        </p>
+        <Money
+          amount={expense.amount}
+          currency={expense.currency}
+          tone="plain"
+          className="mt-2 block font-semibold text-4xl tracking-tight sm:text-5xl"
+        />
+        <p className="mt-2 text-muted-foreground text-sm">{expense.description}</p>
+        {expense.categoryName || expense.category ? (
+          <span
+            className="mt-3 inline-block rounded-full px-2.5 py-0.5 text-xs"
+            style={
+              expense.categoryColor
+                ? {
+                    backgroundColor: `${expense.categoryColor}1a`,
+                    color: expense.categoryColor,
                   }
-                >
-                  {expense.categoryName ?? expense.category}
-                </span>
+                : undefined
+            }
+          >
+            {expense.categoryName ?? expense.category}
+          </span>
+        ) : null}
+        <p className="mt-3 text-muted-foreground text-xs">
+          {expense.expenseDate} · {expense.splitMode}
+        </p>
+      </section>
+
+      {/* Splits */}
+      <section className="surface-acrylic-light overflow-hidden rounded-2xl">
+        <header className="border-border border-b px-5 py-3">
+          <h3 className="font-medium text-foreground text-sm">Splits</h3>
+        </header>
+        <ul className="divide-y divide-border">
+          {expense.splits.map((s) => (
+            <li key={s.id} className="flex items-center justify-between px-5 py-3 text-sm">
+              <div className="min-w-0">
+                <div className="truncate font-medium text-foreground">{s.name}</div>
+                <div className="truncate text-muted-foreground text-xs">{s.email}</div>
               </div>
-            )}
-          </div>
+              <Money
+                amount={s.shareAmount}
+                currency={expense.currency}
+                tone="plain"
+                className="shrink-0"
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
 
-          <div>
-            <h3 className="mb-2 font-medium text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
-              Splits
-            </h3>
-            <ul className="divide-y divide-slate-200/60 dark:divide-slate-800/60">
-              {expense.splits.map((s) => (
-                <li key={s.id} className="flex items-center justify-between py-2 text-sm">
-                  <div className="min-w-0">
-                    <div className="truncate text-slate-900 dark:text-slate-50">{s.name}</div>
-                    <div className="truncate text-slate-500 text-xs dark:text-slate-400">
-                      {s.email}
-                    </div>
-                  </div>
-                  <div className="shrink-0 font-medium text-slate-700 dark:text-slate-300">
-                    {formatMoney(s.shareAmount, expense.currency)}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+      {expense.notes ? (
+        <section className="surface-acrylic-light rounded-2xl p-5">
+          <h3 className="mb-2 font-medium text-foreground text-sm">Notes</h3>
+          <p className="whitespace-pre-wrap text-foreground/90 text-sm leading-relaxed">
+            {expense.notes}
+          </p>
+        </section>
+      ) : null}
 
-          {expense.notes && (
-            <div>
-              <h3 className="mb-1 font-medium text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
-                Notes
-              </h3>
-              <p className="whitespace-pre-wrap text-slate-700 text-sm dark:text-slate-300">
-                {expense.notes}
-              </p>
-            </div>
-          )}
+      <section className="surface-acrylic-light rounded-2xl p-5">
+        <h3 className="mb-3 font-medium text-foreground text-sm">Attachments</h3>
+        <AttachmentsSection
+          workspaceId={workspace.id}
+          expenseId={expense.id}
+          initial={attachments}
+        />
+      </section>
 
-          <div>
-            <h3 className="mb-2 font-medium text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
-              Attachments
-            </h3>
-            <AttachmentsSection
-              workspaceId={workspace.id}
-              expenseId={expense.id}
-              initial={attachments}
-            />
-          </div>
+      <section className="surface-acrylic-light rounded-2xl p-5">
+        <h3 className="mb-3 font-medium text-foreground text-sm">Comments</h3>
+        <CommentsThread
+          workspaceId={workspace.id}
+          expenseId={expense.id}
+          initial={comments}
+          currentUserId={session.user.id}
+        />
+      </section>
 
-          <div>
-            <h3 className="mb-2 font-medium text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
-              Comments
-            </h3>
-            <CommentsThread
-              workspaceId={workspace.id}
-              expenseId={expense.id}
-              initial={comments}
-              currentUserId={session.user.id}
-            />
-          </div>
-        </div>
-      </AuthCard>
+      {/* Footer actions */}
+      <ExpenseActions
+        workspaceId={workspace.id}
+        expenseId={expense.id}
+        editHref={`/workspaces/${workspace.id}/expenses/${expense.id}?edit=1`}
+      />
     </div>
   );
 }

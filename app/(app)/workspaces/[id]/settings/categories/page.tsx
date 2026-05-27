@@ -1,9 +1,8 @@
-import { AuthCard } from "@/components/auth/auth-card";
+import { notFound } from "next/navigation";
+
 import { requireSession } from "@/lib/auth/server";
 import { listCategories } from "@/lib/queries/categories";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { CategoryManager } from "./category-manager";
 
 export const metadata = { title: "Categories · Tracxo" };
@@ -17,19 +16,14 @@ export default async function CategoriesPage({ params }: { params: Promise<{ id:
   const categories = await listCategories(workspace.id);
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4">
-      <Link
-        href={`/workspaces/${workspace.id}/settings`}
-        className="inline-flex items-center text-emerald-700 text-sm underline-offset-4 hover:underline dark:text-emerald-400"
-      >
-        ← Workspace settings
-      </Link>
-      <AuthCard
-        title="Expense categories"
-        description="Tag expenses to group them on lists and reports."
-      >
-        <CategoryManager workspaceId={workspace.id} initial={categories} />
-      </AuthCard>
+    <div className="mx-auto w-full max-w-3xl space-y-6">
+      <header>
+        <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">Categories</h1>
+        <p className="mt-1 text-muted-foreground text-sm">
+          Tag expenses to group them in lists and reports.
+        </p>
+      </header>
+      <CategoryManager workspaceId={workspace.id} initial={categories} />
     </div>
   );
 }

@@ -20,9 +20,16 @@ export function GoogleButton({ next = "/" }: { next?: string }) {
   }
 
   return (
-    <Button type="button" variant="outline" className="w-full" onClick={onClick} disabled={loading}>
-      <GoogleIcon className="mr-2 size-4" />
-      Continue with Google
+    <Button
+      type="button"
+      variant="outline"
+      size="lg"
+      className="group h-11 w-full justify-center gap-2.5 rounded-xl text-base font-medium transition-all hover:shadow-md"
+      onClick={onClick}
+      disabled={loading}
+    >
+      <GoogleIcon className="size-5 transition-transform group-hover:scale-110" />
+      {loading ? "Opening Google…" : "Continue with Google"}
     </Button>
   );
 }

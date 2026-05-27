@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowRight, Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -59,7 +61,12 @@ export function SignupForm({ next }: { next: string }) {
             <FormItem>
               <FormLabel>Full name</FormLabel>
               <FormControl>
-                <Input autoComplete="name" placeholder="Aanya Sharma" {...field} />
+                <Input
+                  autoComplete="name"
+                  placeholder="Aanya Sharma"
+                  className="h-11 rounded-xl"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -72,7 +79,13 @@ export function SignupForm({ next }: { next: string }) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" autoComplete="email" placeholder="you@example.com" {...field} />
+                <Input
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className="h-11 rounded-xl"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -85,15 +98,38 @@ export function SignupForm({ next }: { next: string }) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  className="h-11 rounded-xl"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>At least 8 characters, with a letter and a number.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? "Creating account…" : "Create account"}
+        <Button
+          type="submit"
+          size="lg"
+          className="group h-11 w-full rounded-xl text-base font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/20"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Creating account…
+            </>
+          ) : (
+            <>
+              Create account
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={2}
+              />
+            </>
+          )}
         </Button>
       </form>
     </Form>

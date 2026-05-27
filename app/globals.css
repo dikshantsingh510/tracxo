@@ -421,6 +421,64 @@
   }
 }
 
+/* Landing-page mesh drift — 3 orbs at different slow speeds for organic feel.
+   prefers-reduced-motion halts them via the base layer override (§7.4). */
+@keyframes mesh-drift-1 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(60px, 40px, 0) scale(1.08);
+  }
+}
+@keyframes mesh-drift-2 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-50px, 50px, 0) scale(0.95);
+  }
+}
+@keyframes mesh-drift-3 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(40px, -30px, 0) scale(1.05);
+  }
+}
+
+/* Marquee for trust strip — pure linear infinite scroll. Pause on hover. */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@layer utilities {
+  .animate-mesh-drift-1 {
+    animation: mesh-drift-1 18s ease-in-out infinite;
+  }
+  .animate-mesh-drift-2 {
+    animation: mesh-drift-2 22s ease-in-out infinite;
+  }
+  .animate-mesh-drift-3 {
+    animation: mesh-drift-3 26s ease-in-out infinite;
+  }
+  .animate-marquee {
+    animation: marquee-x 40s linear infinite;
+  }
+  .marquee-pause:hover .animate-marquee {
+    animation-play-state: paused;
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Base                                                                */
 /* ------------------------------------------------------------------ */

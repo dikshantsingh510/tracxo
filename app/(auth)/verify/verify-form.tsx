@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowRight, Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -73,7 +75,7 @@ export function VerifyForm({ defaultEmail, next }: { defaultEmail: string; next:
                   type="email"
                   autoComplete="email"
                   readOnly={!!defaultEmail}
-                  className={defaultEmail ? "bg-slate-100/60 dark:bg-slate-900/40" : ""}
+                  className={`h-11 rounded-xl ${defaultEmail ? "bg-muted/40" : ""}`}
                   {...field}
                 />
               </FormControl>
@@ -89,7 +91,7 @@ export function VerifyForm({ defaultEmail, next }: { defaultEmail: string; next:
               <FormLabel>6-digit code</FormLabel>
               <FormControl>
                 <InputOTP maxLength={6} value={field.value} onChange={field.onChange}>
-                  <InputOTPGroup>
+                  <InputOTPGroup className="gap-1.5 [&>div]:h-12 [&>div]:w-12 [&>div]:rounded-xl [&>div]:border-border [&>div]:bg-background [&>div]:text-base">
                     {Array.from({ length: 6 }).map((_, i) => (
                       // biome-ignore lint/suspicious/noArrayIndexKey: positional slots
                       <InputOTPSlot key={i} index={i} />
@@ -101,17 +103,42 @@ export function VerifyForm({ defaultEmail, next }: { defaultEmail: string; next:
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? "Verifying…" : "Verify"}
+        <Button
+          type="submit"
+          size="lg"
+          className="group h-11 w-full rounded-xl text-base font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/20"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Verifying…
+            </>
+          ) : (
+            <>
+              Verify
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={2}
+              />
+            </>
+          )}
         </Button>
         <Button
           type="button"
           variant="ghost"
-          className="w-full"
+          className="h-11 w-full rounded-xl"
           onClick={onResend}
           disabled={resending}
         >
-          {resending ? "Sending…" : "Resend code"}
+          {resending ? (
+            <>
+              <Loader2 className="size-3.5 animate-spin" />
+              Sending…
+            </>
+          ) : (
+            "Resend code"
+          )}
         </Button>
       </form>
     </Form>

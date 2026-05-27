@@ -1,11 +1,11 @@
 export function AuthDivider({ label = "or" }: { label?: string }) {
   return (
-    <div className="relative my-1 flex items-center" aria-hidden>
-      <div className="flex-1 border-slate-200/70 border-t dark:border-slate-800/70" />
-      <span className="px-3 text-slate-500 text-xs uppercase tracking-wider dark:text-slate-400">
+    <div className="relative my-2 flex items-center" aria-hidden>
+      <div className="flex-1 border-border border-t" />
+      <span className="px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">
         {label}
       </span>
-      <div className="flex-1 border-slate-200/70 border-t dark:border-slate-800/70" />
+      <div className="flex-1 border-border border-t" />
     </div>
   );
 }

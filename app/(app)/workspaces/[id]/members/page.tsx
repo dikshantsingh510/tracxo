@@ -1,9 +1,10 @@
-import { AuthCard } from "@/components/auth/auth-card";
+import { MailCheck, Users } from "lucide-react";
+import { notFound } from "next/navigation";
+
+import { EmptyState } from "@/components/ui/empty-state";
 import { requireSession } from "@/lib/auth/server";
 import { getPendingInvitations, getWorkspaceMembers } from "@/lib/queries/members";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { InviteForm } from "./invite-form";
 import { MembersList } from "./members-list";
 import { PendingInvitesList } from "./pending-invites-list";
@@ -24,42 +25,69 @@ export default async function MembersPage({ params }: { params: Promise<{ id: st
   ]);
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4">
-      <Link
-        href={`/workspaces/${workspace.id}/settings`}
-        className="inline-flex items-center text-emerald-700 text-sm underline-offset-4 hover:underline dark:text-emerald-400"
-      >
-        ← Workspace settings
-      </Link>
+    <div className="mx-auto w-full max-w-3xl space-y-6">
+      <header>
+        <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">Members</h1>
+        <p className="mt-1 text-muted-foreground text-sm">
+          {members.length} member{members.length === 1 ? "" : "s"}
+          {pending.length > 0
+            ? ` · ${pending.length} pending invite${pending.length === 1 ? "" : "s"}`
+            : ""}
+          {" in "}
+          {workspace.name}
+        </p>
+      </header>
 
-      <AuthCard
-        title={`${workspace.name} · members`}
-        description={`${members.length} member${members.length === 1 ? "" : "s"}${pending.length > 0 ? ` · ${pending.length} pending invite${pending.length === 1 ? "" : "s"}` : ""}`}
-      >
-        <MembersList
-          workspaceId={workspace.id}
-          members={members}
-          actorUserId={session.user.id}
-          actorRole={workspace.role}
-        />
-      </AuthCard>
+      {/* Members section */}
+      <section className="space-y-3">
+        <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+          Members
+        </h2>
+        {members.length === 0 ? (
+          <EmptyState
+            icon={Users}
+            heading="No members yet"
+            body="Invite someone using the form below."
+          />
+        ) : (
+          <MembersList
+            workspaceId={workspace.id}
+            members={members}
+            actorUserId={session.user.id}
+            actorRole={workspace.role}
+          />
+        )}
+      </section>
 
-      {canManage && (
+      {canManage ? (
         <>
-          <AuthCard title="Invite someone" description="Share a link or send an email invitation.">
-            <InviteForm workspaceId={workspace.id} />
-          </AuthCard>
+          {/* Invite */}
+          <section className="space-y-3">
+            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+              Invite someone
+            </h2>
+            <div className="surface-acrylic-light rounded-2xl p-5">
+              <InviteForm workspaceId={workspace.id} />
+            </div>
+          </section>
 
-          {pending.length > 0 && (
-            <AuthCard
-              title="Pending invitations"
-              description="Unredeemed invitations awaiting acceptance."
-            >
+          {/* Pending */}
+          <section className="space-y-3">
+            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+              Pending invitations
+            </h2>
+            {pending.length === 0 ? (
+              <EmptyState
+                icon={MailCheck}
+                heading="No pending invitations"
+                body="All invitations have been accepted or revoked."
+              />
+            ) : (
               <PendingInvitesList workspaceId={workspace.id} invitations={pending} />
-            </AuthCard>
-          )}
+            )}
+          </section>
         </>
-      )}
+      ) : null}
     </div>
   );
 }

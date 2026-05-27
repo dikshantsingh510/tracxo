@@ -1,6 +1,20 @@
 "use client";
 
+import { Crown, LogOut, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { RoleBadge } from "@/components/ui/role-badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   changeMemberRole,
   leaveWorkspace,
@@ -8,12 +22,11 @@ import {
   transferOwnership,
 } from "@/lib/actions/members";
 import type { WorkspaceMember } from "@/lib/queries/members";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
 
-const selectClass =
-  "h-8 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+type ConfirmKind =
+  | { kind: "leave"; member: WorkspaceMember }
+  | { kind: "remove"; member: WorkspaceMember }
+  | { kind: "transfer"; member: WorkspaceMember };
 
 export function MembersList({
   workspaceId,
@@ -28,135 +41,177 @@ export function MembersList({
 }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmKind | null>(null);
   const canManage = actorRole === "owner" || actorRole === "admin";
 
-  async function run<T>(key: string, fn: () => Promise<T>, successMsg: string) {
-    setBusyId(key);
+  async function changeRole(member: WorkspaceMember, role: "admin" | "member") {
+    if (role === member.role) return;
+    setBusyId(member.id);
     try {
-      await fn();
-      toast.success(successMsg);
+      await changeMemberRole({ workspaceId, memberId: member.id, role });
+      toast.success("Role updated");
       router.refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : "Could not update role");
     } finally {
       setBusyId(null);
     }
   }
 
+  async function onConfirmLeave() {
+    await leaveWorkspace({ workspaceId });
+    toast.success("Left workspace");
+    router.push("/workspaces");
+  }
+
+  async function onConfirmRemove(member: WorkspaceMember) {
+    await removeMember({ workspaceId, memberId: member.id });
+    toast.success("Member removed");
+    router.refresh();
+  }
+
+  async function onConfirmTransfer(member: WorkspaceMember) {
+    await transferOwnership({ workspaceId, newOwnerMemberId: member.id });
+    toast.success("Ownership transferred");
+    router.refresh();
+  }
+
   return (
-    <ul className="divide-y divide-slate-200/60 dark:divide-slate-800/60">
-      {members.map((m) => {
-        const isSelf = m.userId === actorUserId;
-        const isOwnerRow = m.role === "owner";
-        const canEditRow =
-          canManage && !isOwnerRow && !isSelf && !(actorRole === "admin" && m.role === "admin");
-        const canTransfer = actorRole === "owner" && !isOwnerRow;
+    <>
+      <ul className="surface-acrylic-light divide-y divide-border overflow-hidden rounded-2xl">
+        {members.map((m) => {
+          const isSelf = m.userId === actorUserId;
+          const isOwnerRow = m.role === "owner";
+          const canEditRow =
+            canManage && !isOwnerRow && !isSelf && !(actorRole === "admin" && m.role === "admin");
+          const canTransfer = actorRole === "owner" && !isOwnerRow;
+          const busy = busyId === m.id;
 
-        return (
-          <li key={m.id} className="flex items-center justify-between gap-3 py-3">
-            <div className="min-w-0">
-              <div className="truncate font-medium text-slate-900 text-sm dark:text-slate-50">
-                {m.name}
-                {isSelf && (
-                  <span className="ml-2 font-normal text-slate-500 text-xs dark:text-slate-400">
-                    (you)
-                  </span>
-                )}
-              </div>
-              <div className="truncate text-slate-500 text-xs dark:text-slate-400">{m.email}</div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {canEditRow ? (
-                <select
-                  className={selectClass}
-                  disabled={busyId === m.id}
-                  defaultValue={m.role}
-                  onChange={(e) => {
-                    const role = e.target.value as "admin" | "member";
-                    if (role === m.role) return;
-                    void run(
-                      m.id,
-                      () => changeMemberRole({ workspaceId, memberId: m.id, role }),
-                      "Role updated",
-                    );
-                  }}
-                >
-                  <option value="member">Member</option>
-                  <option value="admin">Admin</option>
-                </select>
-              ) : (
-                <span className="rounded-full bg-slate-200/60 px-2 py-0.5 font-medium text-slate-700 text-xs capitalize dark:bg-slate-800/60 dark:text-slate-300">
-                  {m.role}
+          return (
+            <li
+              key={m.id}
+              className="hover-tint flex flex-col items-stretch gap-3 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-emerald-100 font-semibold text-emerald-700 text-sm dark:bg-emerald-900/40 dark:text-emerald-300">
+                  {m.name.trim()[0]?.toUpperCase() ?? "?"}
                 </span>
-              )}
+                <div className="min-w-0">
+                  <div className="flex items-baseline gap-2 truncate">
+                    <span className="truncate font-medium text-foreground text-sm">{m.name}</span>
+                    {isSelf ? <span className="text-muted-foreground text-xs">(you)</span> : null}
+                  </div>
+                  <div className="truncate text-muted-foreground text-xs">{m.email}</div>
+                </div>
+              </div>
 
-              {isSelf && !isOwnerRow && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={busyId === m.id}
-                  onClick={() => {
-                    if (!confirm("Leave this workspace? You will lose access to its expenses.")) {
-                      return;
-                    }
-                    void run(m.id, () => leaveWorkspace({ workspaceId }), "Left workspace").then(
-                      () => router.push("/workspaces"),
-                    );
-                  }}
-                >
-                  Leave
-                </Button>
-              )}
+              <div className="flex items-center justify-end gap-2">
+                {canEditRow ? (
+                  <Select
+                    value={m.role}
+                    onValueChange={(v) => changeRole(m, v as "admin" | "member")}
+                    disabled={busy}
+                  >
+                    <SelectTrigger className="h-8 w-[110px] rounded-md">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="member">Member</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <RoleBadge role={m.role} />
+                )}
 
-              {canEditRow && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="destructive"
-                  disabled={busyId === m.id}
-                  onClick={() => {
-                    if (!confirm(`Remove ${m.name} from the workspace?`)) return;
-                    void run(
-                      m.id,
-                      () => removeMember({ workspaceId, memberId: m.id }),
-                      "Member removed",
-                    );
-                  }}
-                >
-                  Remove
-                </Button>
-              )}
+                {isSelf && !isOwnerRow ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={busy}
+                    onClick={() => setPendingConfirm({ kind: "leave", member: m })}
+                  >
+                    <LogOut className="size-3.5" strokeWidth={1.75} aria-hidden />
+                    Leave
+                  </Button>
+                ) : null}
 
-              {canTransfer && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={busyId === m.id}
-                  onClick={() => {
-                    if (
-                      !confirm(
-                        `Transfer ownership to ${m.name}? You will become an admin and cannot undo this.`,
-                      )
-                    ) {
-                      return;
-                    }
-                    void run(
-                      m.id,
-                      () => transferOwnership({ workspaceId, newOwnerMemberId: m.id }),
-                      "Ownership transferred",
-                    );
-                  }}
-                >
-                  Make owner
-                </Button>
-              )}
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+                {canTransfer ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    disabled={busy}
+                    onClick={() => setPendingConfirm({ kind: "transfer", member: m })}
+                    title="Transfer ownership"
+                    aria-label={`Transfer ownership to ${m.name}`}
+                  >
+                    <Crown className="size-3.5" strokeWidth={1.75} aria-hidden />
+                  </Button>
+                ) : null}
+
+                {canEditRow ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    disabled={busy}
+                    onClick={() => setPendingConfirm({ kind: "remove", member: m })}
+                    aria-label={`Remove ${m.name}`}
+                  >
+                    <Trash2 className="size-3.5" strokeWidth={1.75} aria-hidden />
+                  </Button>
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Confirm dialogs — one component, dynamic content based on pendingConfirm */}
+      <ConfirmDialog
+        open={pendingConfirm?.kind === "leave"}
+        onOpenChange={(o) => !o && setPendingConfirm(null)}
+        title="Leave this workspace?"
+        description="You will lose access to its expenses immediately. Re-invite needed to rejoin."
+        confirmLabel="Leave"
+        destructive
+        onConfirm={onConfirmLeave}
+      />
+      <ConfirmDialog
+        open={pendingConfirm?.kind === "remove"}
+        onOpenChange={(o) => !o && setPendingConfirm(null)}
+        title={
+          pendingConfirm?.kind === "remove"
+            ? `Remove ${pendingConfirm.member.name}?`
+            : "Remove member?"
+        }
+        description="They lose access immediately. Their expense history stays attached for the workspace."
+        confirmLabel="Remove"
+        destructive
+        onConfirm={async () => {
+          if (pendingConfirm?.kind === "remove") {
+            await onConfirmRemove(pendingConfirm.member);
+          }
+        }}
+      />
+      <ConfirmDialog
+        open={pendingConfirm?.kind === "transfer"}
+        onOpenChange={(o) => !o && setPendingConfirm(null)}
+        title={
+          pendingConfirm?.kind === "transfer"
+            ? `Transfer ownership to ${pendingConfirm.member.name}?`
+            : "Transfer ownership?"
+        }
+        description="You will become an admin. This cannot be undone — only the new owner can transfer back."
+        confirmLabel="Transfer"
+        onConfirm={async () => {
+          if (pendingConfirm?.kind === "transfer") {
+            await onConfirmTransfer(pendingConfirm.member);
+          }
+        }}
+      />
+    </>
   );
 }

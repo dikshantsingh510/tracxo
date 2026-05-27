@@ -1,15 +1,32 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArchiveRestore, ArchiveX, Loader2, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   archiveWorkspace,
   renameWorkspace,
@@ -24,14 +41,6 @@ import {
   renameWorkspaceSchema,
   updateWorkspaceMetaSchema,
 } from "@/lib/validation/workspace";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
-const inputClass =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
 export function SettingsForm({
   workspace,
@@ -43,36 +52,93 @@ export function SettingsForm({
   const router = useRouter();
   const canManage = workspace.role === "owner" || workspace.role === "admin";
   const isOwner = workspace.role === "owner";
-  const isPersonal = workspace.type === "personal";
-  const isArchived = workspace.status === "archived";
 
   return (
     <div className="space-y-6">
-      <RenameSection workspace={workspace} disabled={!canManage} onSaved={() => router.refresh()} />
-      <MetaSection
-        workspace={workspace}
-        currencies={currencies}
-        disabled={!canManage}
-        onSaved={() => router.refresh()}
-      />
-      {isOwner && (
-        <DangerSection
-          workspace={workspace}
-          isPersonal={isPersonal}
-          isArchived={isArchived}
-          onAfter={() => router.refresh()}
-        />
-      )}
-      {!canManage && (
-        <p className="text-slate-500 text-xs dark:text-slate-400">
-          Only owners and admins can edit settings.
-        </p>
-      )}
+      <Tabs defaultValue="general">
+        <TabsList variant="line" className="w-full">
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="currency">Currency</TabsTrigger>
+          {isOwner ? (
+            <TabsTrigger value="danger" className="text-rose-700 dark:text-rose-400">
+              Danger zone
+            </TabsTrigger>
+          ) : null}
+        </TabsList>
+
+        <TabsContent value="general" className="mt-6">
+          <Section title="General" description="Rename your workspace and set its icon.">
+            <GeneralSection
+              workspace={workspace}
+              disabled={!canManage}
+              onSaved={() => router.refresh()}
+            />
+          </Section>
+        </TabsContent>
+
+        <TabsContent value="currency" className="mt-6">
+          <Section
+            title="Currency"
+            description="Default currency new expenses fall back to. Existing expenses keep theirs."
+          >
+            <CurrencySection
+              workspace={workspace}
+              currencies={currencies}
+              disabled={!canManage}
+              onSaved={() => router.refresh()}
+            />
+          </Section>
+        </TabsContent>
+
+        {isOwner ? (
+          <TabsContent value="danger" className="mt-6">
+            <Section
+              title="Danger zone"
+              description="Archive hides this workspace without losing data. Delete starts a 30-day grace period."
+              danger
+            >
+              <DangerSection workspace={workspace} onAfter={() => router.refresh()} />
+            </Section>
+          </TabsContent>
+        ) : null}
+      </Tabs>
+
+      {!canManage ? (
+        <p className="text-muted-foreground text-xs">Only owners and admins can edit settings.</p>
+      ) : null}
     </div>
   );
 }
 
-function RenameSection({
+function Section({
+  title,
+  description,
+  children,
+  danger,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  danger?: boolean;
+}) {
+  return (
+    <div
+      className={`surface-acrylic-light rounded-2xl p-5 sm:p-6 ${danger ? "ring-1 ring-rose-500/20" : ""}`}
+    >
+      <header className="mb-4 border-border border-b pb-3">
+        <h3
+          className={`font-semibold ${danger ? "text-rose-700 dark:text-rose-400" : "text-foreground"}`}
+        >
+          {title}
+        </h3>
+        {description ? <p className="mt-1 text-muted-foreground text-sm">{description}</p> : null}
+      </header>
+      {children}
+    </div>
+  );
+}
+
+function GeneralSection({
   workspace,
   disabled,
   onSaved,
@@ -91,10 +157,10 @@ function RenameSection({
     setSubmitting(true);
     try {
       await renameWorkspace(values);
-      toast.success("Renamed");
+      toast.success("Saved");
       onSaved();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not rename");
+      toast.error(err instanceof Error ? err.message : "Could not save");
     } finally {
       setSubmitting(false);
     }
@@ -102,29 +168,36 @@ function RenameSection({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Workspace name</FormLabel>
               <FormControl>
-                <Input disabled={disabled} {...field} />
+                <Input disabled={disabled} className="h-11 rounded-xl" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" size="sm" disabled={disabled || submitting}>
-          {submitting ? "Saving…" : "Save name"}
+        <Button type="submit" disabled={disabled || submitting}>
+          {submitting ? (
+            <>
+              <Loader2 className="size-3.5 animate-spin" />
+              Saving…
+            </>
+          ) : (
+            "Save changes"
+          )}
         </Button>
       </form>
     </Form>
   );
 }
 
-function MetaSection({
+function CurrencySection({
   workspace,
   currencies,
   disabled,
@@ -149,10 +222,10 @@ function MetaSection({
     setSubmitting(true);
     try {
       await updateWorkspaceMeta(values);
-      toast.success("Settings updated");
+      toast.success("Saved");
       onSaved();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not update settings");
+      toast.error(err instanceof Error ? err.message : "Could not save");
     } finally {
       setSubmitting(false);
     }
@@ -160,7 +233,7 @@ function MetaSection({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="icon"
@@ -172,10 +245,14 @@ function MetaSection({
                   disabled={disabled}
                   placeholder="🏖️"
                   maxLength={64}
+                  className="h-11 rounded-xl"
                   {...field}
                   value={field.value ?? ""}
                 />
               </FormControl>
+              <FormDescription>
+                An emoji or short label that appears in the workspace switcher.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -187,20 +264,32 @@ function MetaSection({
             <FormItem>
               <FormLabel>Default currency</FormLabel>
               <FormControl>
-                <select disabled={disabled} className={inputClass} {...field}>
-                  {currencies.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
+                  <SelectTrigger className="h-11 w-full rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currencies.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" size="sm" disabled={disabled || submitting}>
-          {submitting ? "Saving…" : "Save settings"}
+        <Button type="submit" disabled={disabled || submitting}>
+          {submitting ? (
+            <>
+              <Loader2 className="size-3.5 animate-spin" />
+              Saving…
+            </>
+          ) : (
+            "Save changes"
+          )}
         </Button>
       </form>
     </Form>
@@ -209,77 +298,102 @@ function MetaSection({
 
 function DangerSection({
   workspace,
-  isPersonal,
-  isArchived,
   onAfter,
 }: {
   workspace: WorkspaceDetail;
-  isPersonal: boolean;
-  isArchived: boolean;
   onAfter: () => void;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = useState<string | null>(null);
+  const [confirmKey, setConfirmKey] = useState<"archive" | "restore" | "delete" | null>(null);
+  const isPersonal = workspace.type === "personal";
+  const isArchived = workspace.status === "archived";
 
-  async function run(label: string, fn: () => Promise<unknown>) {
-    setBusy(label);
-    try {
-      await fn();
-      toast.success(`${label} done`);
-      onAfter();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : `Could not ${label.toLowerCase()}`);
-    } finally {
-      setBusy(null);
-    }
+  async function doArchive() {
+    await archiveWorkspace({ id: workspace.id });
+    toast.success("Workspace archived");
+    onAfter();
+  }
+  async function doRestore() {
+    await restoreWorkspace({ id: workspace.id });
+    toast.success("Workspace restored");
+    onAfter();
+  }
+  async function doDelete() {
+    await softDeleteWorkspace({ id: workspace.id });
+    toast.success("Workspace deleted");
+    router.push("/workspaces");
   }
 
   return (
-    <div className="space-y-3 border-slate-200/60 border-t pt-4 dark:border-slate-800/60">
-      <h3 className="font-medium text-slate-700 text-sm dark:text-slate-300">Owner actions</h3>
-      <div className="flex flex-wrap gap-2">
-        {!isArchived ? (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            disabled={busy !== null}
-            onClick={() => run("Archive", () => archiveWorkspace({ id: workspace.id }))}
-          >
-            {busy === "Archive" ? "Archiving…" : "Archive"}
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            disabled={busy !== null}
-            onClick={() => run("Restore", () => restoreWorkspace({ id: workspace.id }))}
-          >
-            {busy === "Restore" ? "Restoring…" : "Restore"}
-          </Button>
-        )}
-        {!isPersonal && (
-          <Button
-            type="button"
-            size="sm"
-            variant="destructive"
-            disabled={busy !== null}
-            onClick={async () => {
-              if (!confirm(`Delete "${workspace.name}"? You have 30 days to restore.`)) return;
-              await run("Delete", () => softDeleteWorkspace({ id: workspace.id }));
-              router.push("/workspaces");
-            }}
-          >
-            {busy === "Delete" ? "Deleting…" : "Delete"}
-          </Button>
-        )}
+    <div className="space-y-4">
+      <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+        <div>
+          <p className="font-medium text-foreground text-sm">
+            {isArchived ? "Restore workspace" : "Archive workspace"}
+          </p>
+          <p className="text-muted-foreground text-xs">
+            {isArchived
+              ? "Bring this workspace back to active state."
+              : "Hide this workspace from members. Data stays intact."}
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => setConfirmKey(isArchived ? "restore" : "archive")}>
+          {isArchived ? (
+            <>
+              <ArchiveRestore className="size-3.5" strokeWidth={1.75} aria-hidden />
+              Restore
+            </>
+          ) : (
+            <>
+              <ArchiveX className="size-3.5" strokeWidth={1.75} aria-hidden />
+              Archive
+            </>
+          )}
+        </Button>
       </div>
-      {isPersonal && (
-        <p className="text-slate-500 text-xs dark:text-slate-400">
-          Personal workspaces cannot be deleted.
-        </p>
+
+      {!isPersonal ? (
+        <div className="flex flex-col items-start justify-between gap-3 border-rose-500/20 border-t pt-4 sm:flex-row sm:items-center">
+          <div>
+            <p className="font-medium text-foreground text-sm">Delete workspace</p>
+            <p className="text-muted-foreground text-xs">
+              Soft-deletes with 30 days to restore. Members lose access immediately.
+            </p>
+          </div>
+          <Button variant="destructive" onClick={() => setConfirmKey("delete")}>
+            <Trash2 className="size-3.5" strokeWidth={1.75} aria-hidden />
+            Delete
+          </Button>
+        </div>
+      ) : (
+        <p className="text-muted-foreground text-xs">Personal workspaces cannot be deleted.</p>
       )}
+
+      <ConfirmDialog
+        open={confirmKey === "archive"}
+        onOpenChange={(o) => !o && setConfirmKey(null)}
+        title={`Archive "${workspace.name}"?`}
+        description="Members will lose access until you restore. All expense history stays intact."
+        confirmLabel="Archive"
+        onConfirm={doArchive}
+      />
+      <ConfirmDialog
+        open={confirmKey === "restore"}
+        onOpenChange={(o) => !o && setConfirmKey(null)}
+        title={`Restore "${workspace.name}"?`}
+        description="Members will regain access immediately."
+        confirmLabel="Restore"
+        onConfirm={doRestore}
+      />
+      <ConfirmDialog
+        open={confirmKey === "delete"}
+        onOpenChange={(o) => !o && setConfirmKey(null)}
+        title={`Delete "${workspace.name}"?`}
+        description="Soft-deletes the workspace. You have 30 days to restore before data is permanently removed."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={doDelete}
+      />
     </div>
   );
 }

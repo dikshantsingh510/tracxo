@@ -153,11 +153,13 @@ export default async function InviteRedeemPage({
             <div className="flex flex-col gap-2 sm:flex-row">
               <Button
                 className="flex-1"
+                nativeButton={false}
                 render={<Link href={`/login?next=${encodeURIComponent(nextUrl)}`}>Sign in</Link>}
               />
               <Button
                 variant="outline"
                 className="flex-1"
+                nativeButton={false}
                 render={
                   <Link href={`/signup?next=${encodeURIComponent(nextUrl)}`}>Create account</Link>
                 }

@@ -1,12 +1,12 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Check, Loader2 } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 
-import { Button, buttonVariants } from "@/components/ui/button";
-import type { VariantProps } from "class-variance-authority";
+import { Button, type buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { VariantProps } from "class-variance-authority";
 
 // DESIGN.md §8.17 — Two-state morph button.
 // Idle → Pending → Success → revert to Idle.
@@ -119,9 +119,7 @@ export function MorphButton({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={
-                reduce
-                  ? { duration: 0.15 }
-                  : { type: "spring", stiffness: 520, damping: 18 }
+                reduce ? { duration: 0.15 } : { type: "spring", stiffness: 520, damping: 18 }
               }
               className="inline-flex items-center gap-1.5"
             >

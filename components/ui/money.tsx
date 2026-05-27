@@ -54,7 +54,5 @@ export function Money({
   const formatted = formatMoney(amount, currency, locale);
   const display = sign === "always" && amount > 0n ? `+${formatted}` : formatted;
 
-  return (
-    <span className={cn("tabular-nums", TONE_CLASS[resolved], className)}>{display}</span>
-  );
+  return <span className={cn("tabular-nums", TONE_CLASS[resolved], className)}>{display}</span>;
 }

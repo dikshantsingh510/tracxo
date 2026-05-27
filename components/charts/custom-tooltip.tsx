@@ -25,14 +25,11 @@ export function CustomChartTooltip({ active, payload, label, currency }: Props) 
         // recharts adds an outer wrapper; ensure no extra padding/border leak
       )}
     >
-      {label ? (
-        <div className="mb-1 font-medium text-foreground">{label}</div>
-      ) : null}
+      {label ? <div className="mb-1 font-medium text-foreground">{label}</div> : null}
       <ul className="flex flex-col gap-1">
         {payload.map((entry, i) => {
           const raw = entry.value;
-          const numeric =
-            typeof raw === "number" && Number.isFinite(raw) ? raw : 0;
+          const numeric = typeof raw === "number" && Number.isFinite(raw) ? raw : 0;
           // Minor-unit BigInt for <Money>; recharts gives us major units from
           // analytics, so we convert back. If `currency` is omitted, fall
           // back to plain number rendering.

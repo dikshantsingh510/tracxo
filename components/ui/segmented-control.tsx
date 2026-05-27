@@ -97,9 +97,7 @@ export function SegmentedControl<T extends string>({
             className={cn(
               "relative inline-flex shrink-0 items-center justify-center rounded-md px-3 font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50",
               heightClass,
-              active
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground",
+              active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >
             {active && (
@@ -108,9 +106,7 @@ export function SegmentedControl<T extends string>({
                 aria-hidden
                 className="absolute inset-0 rounded-md bg-background shadow-xs ring-1 ring-foreground/5"
                 transition={
-                  reduce
-                    ? { duration: 0 }
-                    : { type: "spring", stiffness: 360, damping: 32 }
+                  reduce ? { duration: 0 } : { type: "spring", stiffness: 360, damping: 32 }
                 }
               />
             )}

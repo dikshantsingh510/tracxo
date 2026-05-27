@@ -126,9 +126,7 @@ export function UploadZone({
       />
       <div className="flex flex-col gap-1">
         <p className="font-medium text-foreground text-sm">{busy ? "Uploading…" : idleLabel}</p>
-        {idleHelper ? (
-          <p className="text-muted-foreground text-xs">{idleHelper}</p>
-        ) : null}
+        {idleHelper ? <p className="text-muted-foreground text-xs">{idleHelper}</p> : null}
       </div>
       <Button
         type="button"

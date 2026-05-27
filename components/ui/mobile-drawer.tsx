@@ -1,7 +1,7 @@
 "use client";
 
-import { Drawer as VaulDrawer } from "vaul";
 import type { ReactNode } from "react";
+import { Drawer as VaulDrawer } from "vaul";
 
 import { cn } from "@/lib/utils";
 
@@ -31,9 +31,7 @@ export function MobileDrawer({
   return (
     <VaulDrawer.Root open={open} onOpenChange={onOpenChange}>
       <VaulDrawer.Portal>
-        <VaulDrawer.Overlay
-          className="fixed inset-0 z-[var(--z-drawer)] bg-black/40 backdrop-blur-sm"
-        />
+        <VaulDrawer.Overlay className="fixed inset-0 z-[var(--z-drawer)] bg-black/40 backdrop-blur-sm" />
         <VaulDrawer.Content
           aria-describedby={description ? undefined : undefined}
           className={cn(

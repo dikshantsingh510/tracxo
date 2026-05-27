@@ -19,15 +19,11 @@ const badgeVariants = cva(
         ghost: "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
         // Semantic — §8.10
-        success:
-          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-        danger:
-          "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
-        warning:
-          "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+        success: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+        danger: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
+        warning: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
         info: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
-        neutral:
-          "bg-neutral-200/70 text-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-300",
+        neutral: "bg-neutral-200/70 text-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-300",
       },
       size: {
         xs: "h-5 px-2 py-0 text-[10px] tracking-wide",

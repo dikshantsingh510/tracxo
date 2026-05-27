@@ -2,7 +2,7 @@
 
 import { Command as CmdkCommand } from "cmdk";
 import { Search } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useCommandPalette } from "@/components/command-palette/provider";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,16 @@ export function CommandPalette() {
     return Array.from(map.entries());
   }, [commands]);
 
+  // Esc closes — registered while open so we don't leak listeners.
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, setOpen]);
+
   if (!open) return null;
 
   return (
@@ -34,6 +44,9 @@ export function CommandPalette() {
       // Backdrop — opacity-only crossfade, no scale or movement
       className="fixed inset-0 z-[var(--z-cmdk-backdrop)] flex items-start justify-center bg-black/30 px-4 pt-[10vh] supports-backdrop-filter:backdrop-blur-sm"
       onClick={() => setOpen(false)}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") setOpen(false);
+      }}
       role="presentation"
     >
       <CmdkCommand

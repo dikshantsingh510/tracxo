@@ -91,10 +91,7 @@ export function DataTable<Row, Key extends string>({
                       {Icon ? (
                         <Icon
                           aria-hidden
-                          className={cn(
-                            "size-3.5",
-                            isSorted ? "text-foreground" : "opacity-50",
-                          )}
+                          className={cn("size-3.5", isSorted ? "text-foreground" : "opacity-50")}
                           strokeWidth={2}
                         />
                       ) : null}

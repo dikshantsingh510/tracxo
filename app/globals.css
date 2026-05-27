@@ -11,7 +11,7 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, "JetBrains Mono", "Menlo", monospace;
 
-  /* Emerald accent ramp (primary CTA, focus, success) */
+  /* Emerald accent ramp (primary CTA, focus, success) — DESIGN.md §2.1 */
   --color-emerald-50: #ecfdf5;
   --color-emerald-100: #d1fae5;
   --color-emerald-200: #a7f3d0;
@@ -24,32 +24,77 @@
   --color-emerald-900: #064e3b;
   --color-emerald-950: #022c22;
 
-  /* Warm-slate neutrals (green-tinted, custom — not Tailwind gray) */
-  --color-slate-50: #f7faf8;
-  --color-slate-100: #eef3ef;
-  --color-slate-200: #dde6e0;
-  --color-slate-300: #c2d0c7;
-  --color-slate-400: #97a89c;
-  --color-slate-500: #687a6e;
-  --color-slate-600: #4a5a50;
-  --color-slate-700: #364239;
-  --color-slate-800: #232c26;
-  --color-slate-900: #161c18;
-  --color-slate-950: #0c100d;
+  /* Warm-slate neutrals (green-tinted, custom — not Tailwind gray) — DESIGN.md §2.2 */
+  /* `slate-*` and `neutral-*` are aliases — DESIGN.md spec name is `neutral-*`.
+     Legacy `slate-*` classes remain functional during Phase 2 migration. */
+  --color-slate-50: #f8faf9;
+  --color-slate-100: #f0f3f1;
+  --color-slate-200: #e3e8e5;
+  --color-slate-300: #cdd4d0;
+  --color-slate-400: #9ca8a2;
+  --color-slate-500: #6b7872;
+  --color-slate-600: #4d5852;
+  --color-slate-700: #364039;
+  --color-slate-800: #1f2722;
+  --color-slate-900: #0f1612;
+  --color-slate-950: #0a0f0d;
 
-  /* Border radius scale (PROMPT/DESIGN: 8 / 12 / 16, never mix > 3) */
+  --color-neutral-50: var(--color-slate-50);
+  --color-neutral-100: var(--color-slate-100);
+  --color-neutral-200: var(--color-slate-200);
+  --color-neutral-300: var(--color-slate-300);
+  --color-neutral-400: var(--color-slate-400);
+  --color-neutral-500: var(--color-slate-500);
+  --color-neutral-600: var(--color-slate-600);
+  --color-neutral-700: var(--color-slate-700);
+  --color-neutral-800: var(--color-slate-800);
+  --color-neutral-900: var(--color-slate-900);
+  --color-neutral-950: var(--color-slate-950);
+
+  /* Chart palette — DESIGN.md §8.20 */
+  --color-chart-emerald: #10b981;
+  --color-chart-teal: #14b8a6;
+  --color-chart-indigo: #6366f1;
+  --color-chart-amber: #f59e0b;
+  --color-chart-pink: #ec4899;
+  --color-chart-violet: #8b5cf6;
+  --color-chart-cyan: #06b6d4;
+  --color-chart-orange: #f97316;
+
+  /* Border radius scale — DESIGN.md §5 */
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-2xl: 20px;
+  --radius-full: 9999px;
 
-  /* Motion — 200ms default, 500ms ceiling, ease-out-quint */
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Easing curves — DESIGN.md §7.1 */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1); /* default */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* restricted — §7.1 */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1); /* iOS-like */
+
+  /* Durations — DESIGN.md §7.2; 500ms hard ceiling */
   --duration-fast: 120ms;
   --duration-base: 200ms;
-  --duration-slow: 320ms;
+  --duration-slow: 300ms;
+  --duration-slower: 400ms;
+  --duration-page: 500ms;
+
+  /* Z-index scale — DESIGN.md §6.1; never invent inline */
+  --z-base: 0;
+  --z-dropdown: 60;
+  --z-sticky: 70;
+  --z-drawer: 80;
+  --z-modal-backdrop: 89;
+  --z-modal: 90;
+  --z-toast: 100;
+  --z-cmdk-backdrop: 109;
+  --z-cmdk: 110;
+  --z-tooltip: 120;
 }
 
 /* shadcn semantic tokens — light */
@@ -65,8 +110,11 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.012 158);
 
-  --primary: oklch(0.685 0.158 162); /* emerald-500 */
+  --primary: oklch(0.685 0.158 162); /* emerald-500 — brand fill (logo, primary button bg) */
   --primary-foreground: oklch(0.99 0.005 150);
+  /* AA-safe emerald TEXT on light surfaces — DESIGN.md §2.3 contrast note.
+     emerald-600 on white = 3.76:1 (fails AA normal text). Use emerald-700 (5.55:1). */
+  --primary-fg: var(--color-emerald-700);
 
   --secondary: oklch(0.96 0.006 156);
   --secondary-foreground: oklch(0.28 0.014 158);
@@ -117,6 +165,7 @@
 
   --primary: oklch(0.74 0.155 162);
   --primary-foreground: oklch(0.14 0.012 158);
+  --primary-fg: var(--color-emerald-400);
 
   --secondary: oklch(0.24 0.012 158);
   --secondary-foreground: oklch(0.93 0.006 156);
@@ -163,6 +212,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-fg: var(--primary-fg);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -199,25 +249,45 @@
 /* ------------------------------------------------------------------ */
 
 @layer utilities {
+  /* Surface Tier 2 — Acrylic Light (cards, panels). DESIGN.md §2.4 */
   .surface-acrylic-light {
     background-color: var(--surface-light-bg);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--border);
+    box-shadow: 0 1px 2px rgba(15, 22, 18, 0.04), 0 0 0 1px rgba(15, 22, 18, 0.02);
+  }
+  .dark .surface-acrylic-light {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
+  /* Surface Tier 3 — Acrylic Heavy (sidebar, modal, dropdown, cmdk). DESIGN.md §2.4 */
   .surface-acrylic-heavy {
     background-color: var(--surface-heavy-bg);
-    backdrop-filter: blur(40px) saturate(160%);
-    -webkit-backdrop-filter: blur(40px) saturate(160%);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
     border: 1px solid var(--border);
+    box-shadow: 0 16px 40px rgba(15, 22, 18, 0.08), 0 4px 12px rgba(15, 22, 18, 0.04), inset 0 1px 0
+      rgba(255, 255, 255, 0.5);
+  }
+  .dark .surface-acrylic-heavy {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0
+      rgba(255, 255, 255, 0.05);
   }
 
+  /* Frosted Emerald — special variant (positive balance, settle-up suggestion). DESIGN.md §2.4 */
   .surface-emerald-frosted {
     background-color: var(--surface-emerald-bg);
-    backdrop-filter: blur(28px) saturate(150%);
-    -webkit-backdrop-filter: blur(28px) saturate(150%);
-    border: 1px solid var(--accent);
+    background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.02));
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  .dark .surface-emerald-frosted {
+    background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04));
+    border-color: rgba(52, 211, 153, 0.2);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   /* Solid fallback for browsers without backdrop-filter */
@@ -229,6 +299,76 @@
     .surface-emerald-frosted {
       background-color: var(--accent);
     }
+  }
+
+  /* Money values — DESIGN.md §3.4 */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* Stagger fade-up — DESIGN.md §7.7. Apply `.stagger > *` to a list container
+     on initial mount; child :nth-child rules cascade animation-delay 0-160ms. */
+  .stagger > * {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: fade-up var(--duration-slow) var(--ease-out-quint) forwards;
+  }
+  .stagger > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .stagger > *:nth-child(2) {
+    animation-delay: 40ms;
+  }
+  .stagger > *:nth-child(3) {
+    animation-delay: 80ms;
+  }
+  .stagger > *:nth-child(4) {
+    animation-delay: 120ms;
+  }
+  .stagger > *:nth-child(n + 5) {
+    animation-delay: 160ms;
+  }
+
+  /* Skeleton shimmer — DESIGN.md §7.3 (1s linear, faster = feels faster). */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-neutral-100) 25%,
+      var(--color-neutral-200) 50%,
+      var(--color-neutral-100) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1s linear infinite;
+  }
+  .dark .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-neutral-800) 25%,
+      var(--color-neutral-700) 50%,
+      var(--color-neutral-800) 75%
+    );
+    background-size: 200% 100%;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Keyframes — DESIGN.md §7                                            */
+/* ------------------------------------------------------------------ */
+
+@keyframes fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 
@@ -244,24 +384,53 @@
   body {
     height: 100%;
   }
+  html {
+    scroll-behavior: smooth;
+  }
+  /* Surface Tier 1 — "Mica" page background. DESIGN.md §2.4 */
   body {
     background-color: var(--background);
+    background-image: radial-gradient(at 0% 0%, hsla(160, 50%, 95%, 0.6) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(160, 40%, 92%, 0.5) 0px, transparent 50%);
+    background-attachment: fixed;
     color: var(--foreground);
     font-family: var(--font-sans);
+    /* Inter alternate glyphs (CommonLooking digits, alt-1, alt-3) + tabular by default */
+    font-feature-settings: "cv11", "ss01", "ss03";
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
-  :focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
+  .dark body {
+    background-image: radial-gradient(at 0% 0%, hsla(160, 60%, 8%, 0.8) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(160, 50%, 6%, 0.7) 0px, transparent 50%);
   }
+
+  /* Focus ring — DESIGN.md §11.3. Outline-first (survives overflow:hidden);
+     box-shadow halo is decorative. */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+    transition: outline-color var(--duration-fast) var(--ease-out-quint), box-shadow
+      var(--duration-fast) var(--ease-out-quint);
+  }
+
+  /* Reduce motion — DESIGN.md §7.4: strip movement, keep opacity/color for state clarity. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
-      animation-duration: 0.01ms !important;
+      animation-duration: 1ms !important;
       animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
+      transition-property: opacity, background-color, color, border-color, fill, stroke !important;
+      transition-duration: 150ms !important;
+    }
+    [data-motion="slide"],
+    [data-motion="scale"] {
+      transform: none !important;
+    }
+    html {
       scroll-behavior: auto !important;
     }
   }

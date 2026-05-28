@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
+    <main className="relative flex min-h-screen items-center justify-center bg-background px-4 py-10 text-foreground">
       {/* Toned ambient backdrop — focus stays on the form */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="-top-32 -left-32 absolute size-[28rem] rounded-full bg-emerald-300/15 blur-3xl dark:bg-emerald-700/10" />

@@ -1,12 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { SearchFilters } from "@/lib/validation/search";
 
 // Plain HTML form — submits via GET so the URL becomes the canonical state.
-// Server reads the new searchParams on the next render. No client JS needed.
-const SELECT_CLASS =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+// Server reads the new searchParams on the next render. Select syncs a hidden
+// named input, so the GET submit carries the choice without client wiring.
 
 export function SearchForm({
   workspaceId,
@@ -35,25 +41,35 @@ export function SearchForm({
       </Field>
 
       <Field label="Category">
-        <select className={SELECT_CLASS} name="categoryId" defaultValue={filters.categoryId ?? ""}>
-          <option value="">Any</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <Select name="categoryId" defaultValue={filters.categoryId ?? ""}>
+          <SelectTrigger className="h-9 w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Any</SelectItem>
+            {categories.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </Field>
 
       <Field label="Paid by">
-        <select className={SELECT_CLASS} name="payerId" defaultValue={filters.payerId ?? ""}>
-          <option value="">Any</option>
-          {members.map((m) => (
-            <option key={m.userId} value={m.userId}>
-              {m.name}
-            </option>
-          ))}
-        </select>
+        <Select name="payerId" defaultValue={filters.payerId ?? ""}>
+          <SelectTrigger className="h-9 w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Any</SelectItem>
+            {members.map((m) => (
+              <SelectItem key={m.userId} value={m.userId}>
+                {m.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </Field>
 
       <Field label="From">

@@ -4,7 +4,7 @@ import { type CurrencyBalance, computeBalances } from "@/lib/balance/compute";
 import { db } from "@/lib/db/client";
 import { expenseSplits, expenses, settlements, user, workspaceMembers } from "@/lib/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
-import { unstable_cache } from "next/cache";
+import { cachedJson } from "./cache";
 
 export const balanceCacheTags = {
   workspaceBalances: (workspaceId: string) => `workspace:${workspaceId}:balances`,
@@ -95,9 +95,11 @@ async function getWorkspaceBalancesQuery(workspaceId: string): Promise<DisplayBa
 }
 
 export function getWorkspaceBalances(workspaceId: string): Promise<DisplayBalance[]> {
-  return unstable_cache(
+  return cachedJson(
     () => getWorkspaceBalancesQuery(workspaceId),
     ["workspace-balances", workspaceId],
-    { tags: [balanceCacheTags.workspaceBalances(workspaceId)] },
-  )();
+    {
+      tags: [balanceCacheTags.workspaceBalances(workspaceId)],
+    },
+  );
 }

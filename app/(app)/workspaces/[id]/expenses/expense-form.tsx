@@ -3,6 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createExpense, updateExpense } from "@/lib/actions/expenses";
 import { currencyCodeEnum } from "@/lib/db/schema/auth";
 import { minorToDecimalString, parseAmountMinor } from "@/lib/money";
@@ -29,9 +36,6 @@ type Initial = {
   splitMode: Mode;
   splits: Array<{ userId: string; shareAmount: bigint; rawInput: unknown }>;
 };
-
-const SELECT_CLASS =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
 export function ExpenseForm(
   props:
@@ -226,33 +230,35 @@ export function ExpenseForm(
           />
         </Field>
         <Field label="Currency">
-          <select
-            className={SELECT_CLASS}
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-          >
-            {currencyCodeEnum.enumValues.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          <Select value={currency} onValueChange={(v) => v && setCurrency(v)}>
+            <SelectTrigger className="h-9 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {currencyCodeEnum.enumValues.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="Paid by">
-          <select
-            className={SELECT_CLASS}
-            value={paidBy}
-            onChange={(e) => setPaidBy(e.target.value)}
-          >
-            {props.members.map((m) => (
-              <option key={m.userId} value={m.userId}>
-                {m.name}
-              </option>
-            ))}
-          </select>
+          <Select value={paidBy} onValueChange={(v) => v && setPaidBy(v)}>
+            <SelectTrigger className="h-9 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {props.members.map((m) => (
+                <SelectItem key={m.userId} value={m.userId}>
+                  {m.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
         <Field label="Date">
           <Input type="date" value={expenseDate} onChange={(e) => setExpenseDate(e.target.value)} />
@@ -260,32 +266,37 @@ export function ExpenseForm(
       </div>
 
       <Field label="Category (optional)">
-        <select
-          className={SELECT_CLASS}
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
+        <Select
+          value={categoryId || "none"}
+          onValueChange={(v) => setCategoryId(v && v !== "none" ? v : "")}
         >
-          <option value="">— Uncategorized —</option>
-          {props.categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="h-9 w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">— Uncategorized —</SelectItem>
+            {props.categories.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </Field>
 
       <Field label="Split mode">
-        <select
-          className={SELECT_CLASS}
-          value={splitMode}
-          onChange={(e) => setSplitMode(e.target.value as Mode)}
-        >
-          <option value="equal">Equal — divide evenly</option>
-          <option value="unequal">Unequal — enter amount per person</option>
-          <option value="percentage">Percentage — sums to 100</option>
-          <option value="share">Shares — proportional units</option>
-          <option value="itemized">Itemized — one row per item</option>
-        </select>
+        <Select value={splitMode} onValueChange={(v) => v && setSplitMode(v as Mode)}>
+          <SelectTrigger className="h-9 w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="equal">Equal — divide evenly</SelectItem>
+            <SelectItem value="unequal">Unequal — enter amount per person</SelectItem>
+            <SelectItem value="percentage">Percentage — sums to 100</SelectItem>
+            <SelectItem value="share">Shares — proportional units</SelectItem>
+            <SelectItem value="itemized">Itemized — one row per item</SelectItem>
+          </SelectContent>
+        </Select>
       </Field>
 
       <SplitEditor

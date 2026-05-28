@@ -3,7 +3,7 @@ import "server-only";
 import { db } from "@/lib/db/client";
 import { settlements, user } from "@/lib/db/schema";
 import { aliasedTable, and, desc, eq, isNull } from "drizzle-orm";
-import { unstable_cache } from "next/cache";
+import { cachedJson } from "./cache";
 
 export const settlementCacheTags = {
   workspaceSettlements: (workspaceId: string) => `workspace:${workspaceId}:settlements`,
@@ -48,11 +48,11 @@ async function listSettlementsQuery(workspaceId: string): Promise<SettlementRow[
 }
 
 export function listSettlements(workspaceId: string): Promise<SettlementRow[]> {
-  return unstable_cache(
+  return cachedJson(
     () => listSettlementsQuery(workspaceId),
     ["workspace-settlements", workspaceId],
     { tags: [settlementCacheTags.workspaceSettlements(workspaceId)] },
-  )();
+  );
 }
 
 // Looks up the UPI VPA for a single user. Used by the settle-up flow to

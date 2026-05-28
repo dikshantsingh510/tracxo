@@ -62,16 +62,16 @@ export function FeedbackWidget() {
       style={{ zIndex: "var(--z-toast)" }}
     >
       {open && (
-        <div className="surface-acrylic-heavy mb-3 w-80 rounded-xl border border-slate-200/60 p-4 shadow-xl dark:border-slate-800/60">
-          <h3 className="font-semibold text-slate-900 text-sm dark:text-slate-50">
+        <div className="surface-acrylic-heavy mb-3 w-80 rounded-xl border border-neutral-200/60 p-4 shadow-xl dark:border-neutral-800/60">
+          <h3 className="font-semibold text-neutral-900 text-sm dark:text-neutral-50">
             Send us feedback
           </h3>
-          <p className="mt-1 text-slate-500 text-xs dark:text-slate-400">
+          <p className="mt-1 text-neutral-500 text-xs dark:text-neutral-400">
             Bug, idea, or hello — we read everything.
           </p>
           <form onSubmit={form.handleSubmit(onSubmit)} className="mt-3 space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-slate-700 text-xs dark:text-slate-300">Type</Label>
+              <Label className="text-neutral-700 text-xs dark:text-neutral-300">Type</Label>
               <select className={SELECT_CLASS} {...form.register("type")}>
                 <option value="bug">Bug</option>
                 <option value="idea">Idea</option>
@@ -80,7 +80,7 @@ export function FeedbackWidget() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-slate-700 text-xs dark:text-slate-300">Message</Label>
+              <Label className="text-neutral-700 text-xs dark:text-neutral-300">Message</Label>
               <textarea
                 className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 placeholder="What's on your mind?"
@@ -118,7 +118,7 @@ export function FeedbackWidget() {
         type="button"
         aria-label={open ? "Close feedback" : "Send feedback"}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex size-11 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg transition hover:bg-emerald-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950"
+        className="inline-flex size-11 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg transition hover:bg-emerald-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-950"
       >
         <MessageSquare className="size-5" strokeWidth={1.75} />
       </button>

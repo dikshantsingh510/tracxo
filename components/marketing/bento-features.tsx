@@ -133,7 +133,7 @@ function CurrencyDrift() {
     <div className="marquee-pause group relative overflow-hidden">
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[var(--surface-light-bg)] to-transparent" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[var(--surface-light-bg)] to-transparent" />
-      <div className="flex w-max items-center gap-3 animate-marquee">
+      <div className="flex w-max animate-marquee items-center gap-3">
         {[...codes.map((c) => ({ c, k: `a-${c}` })), ...codes.map((c) => ({ c, k: `b-${c}` }))].map(
           ({ c, k }) => (
             <span
@@ -255,7 +255,7 @@ export function BentoFeatures() {
             <CardTitle>UPI in one tap.</CardTitle>
             <CardBody>Pre-filled deep link opens your favourite UPI app.</CardBody>
           </div>
-          <div className="flex-1 grid place-items-center">
+          <div className="grid flex-1 place-items-center">
             <PhoneMockup />
           </div>
         </Card>

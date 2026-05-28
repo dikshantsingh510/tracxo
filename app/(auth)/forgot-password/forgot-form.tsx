@@ -81,7 +81,7 @@ export function ForgotForm() {
         <Button
           type="submit"
           size="lg"
-          className="group h-11 w-full rounded-xl text-base font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/20"
+          className="group h-11 w-full rounded-xl font-medium text-base transition hover:shadow-emerald-500/20 hover:shadow-lg"
           disabled={submitting}
         >
           {submitting ? (

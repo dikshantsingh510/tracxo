@@ -192,7 +192,7 @@ export function SettlementForm({
         </a>
       )}
       {method === "upi" && !upiHref && fromUserId === actorUserId && !recipientUpiVpa && (
-        <p className="text-slate-500 text-xs dark:text-slate-400">
+        <p className="text-neutral-500 text-xs dark:text-neutral-400">
           {recipient?.name} hasn&apos;t saved a UPI ID. Settlement will still be recorded.
         </p>
       )}
@@ -207,7 +207,7 @@ export function SettlementForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-slate-700 text-xs dark:text-slate-300">{label}</Label>
+      <Label className="text-neutral-700 text-xs dark:text-neutral-300">{label}</Label>
       {children}
     </div>
   );

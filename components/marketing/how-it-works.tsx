@@ -35,7 +35,7 @@ function Connector() {
       focusable="false"
       viewBox="0 0 600 12"
       preserveAspectRatio="none"
-      className="absolute top-1/2 left-0 hidden h-3 w-full -translate-y-1/2 lg:block"
+      className="-translate-y-1/2 absolute top-1/2 left-0 hidden h-3 w-full lg:block"
     >
       <title>Decorative connector between steps</title>
       <motion.line

@@ -12,7 +12,7 @@ export function AuthCard({
   footer?: React.ReactNode;
 }) {
   return (
-    <Card className="surface-acrylic-heavy gap-0 border-border rounded-2xl py-0 shadow-2xl">
+    <Card className="surface-acrylic-heavy gap-0 rounded-2xl border-border py-0 shadow-2xl">
       <CardHeader className="space-y-2 px-8 pt-8 pb-4 text-center lg:text-left">
         <CardTitle className="font-semibold text-2xl text-foreground tracking-tight">
           {title}

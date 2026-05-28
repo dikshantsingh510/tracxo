@@ -49,7 +49,7 @@ export function Testimonials() {
         {QUOTES.map((t, i) => (
           <li key={t.author} className="min-w-[85%] snap-center sm:min-w-0">
             <SectionReveal delay={0.06 * i}>
-              <article className="surface-acrylic-light flex h-full flex-col gap-5 rounded-2xl p-6 transition-transform hover:-translate-y-0.5 sm:p-7">
+              <article className="surface-acrylic-light hover:-translate-y-0.5 flex h-full flex-col gap-5 rounded-2xl p-6 transition-transform sm:p-7">
                 <Quote
                   aria-hidden
                   className="size-8 text-muted-foreground opacity-30"

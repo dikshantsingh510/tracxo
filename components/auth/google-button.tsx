@@ -24,7 +24,7 @@ export function GoogleButton({ next = "/" }: { next?: string }) {
       type="button"
       variant="outline"
       size="lg"
-      className="group h-11 w-full justify-center gap-2.5 rounded-xl text-base font-medium transition-all hover:shadow-md"
+      className="group h-11 w-full justify-center gap-2.5 rounded-xl font-medium text-base transition hover:shadow-md"
       onClick={onClick}
       disabled={loading}
     >

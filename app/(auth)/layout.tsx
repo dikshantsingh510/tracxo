@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Mobile-only logo lockup (split-screen pages hide their own logo here) */}
       <Link
         href="/"
-        className="absolute top-6 left-1/2 -translate-x-1/2 rounded-md font-semibold text-foreground text-xl tracking-tight focus-visible:outline-2 focus-visible:outline-emerald-500 focus-visible:outline-offset-2 lg:hidden"
+        className="-translate-x-1/2 absolute top-6 left-1/2 rounded-md font-semibold text-foreground text-xl tracking-tight focus-visible:outline-2 focus-visible:outline-emerald-500 focus-visible:outline-offset-2 lg:hidden"
       >
         Tracxo
       </Link>

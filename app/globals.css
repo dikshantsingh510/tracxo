@@ -24,32 +24,19 @@
   --color-emerald-900: #064e3b;
   --color-emerald-950: #022c22;
 
-  /* Warm-slate neutrals (green-tinted, custom — not Tailwind gray) — DESIGN.md §2.2 */
-  /* `slate-*` and `neutral-*` are aliases — DESIGN.md spec name is `neutral-*`.
-     Legacy `slate-*` classes remain functional during Phase 2 migration. */
-  --color-slate-50: #f8faf9;
-  --color-slate-100: #f0f3f1;
-  --color-slate-200: #e3e8e5;
-  --color-slate-300: #cdd4d0;
-  --color-slate-400: #9ca8a2;
-  --color-slate-500: #6b7872;
-  --color-slate-600: #4d5852;
-  --color-slate-700: #364039;
-  --color-slate-800: #1f2722;
-  --color-slate-900: #0f1612;
-  --color-slate-950: #0a0f0d;
-
-  --color-neutral-50: var(--color-slate-50);
-  --color-neutral-100: var(--color-slate-100);
-  --color-neutral-200: var(--color-slate-200);
-  --color-neutral-300: var(--color-slate-300);
-  --color-neutral-400: var(--color-slate-400);
-  --color-neutral-500: var(--color-slate-500);
-  --color-neutral-600: var(--color-slate-600);
-  --color-neutral-700: var(--color-slate-700);
-  --color-neutral-800: var(--color-slate-800);
-  --color-neutral-900: var(--color-slate-900);
-  --color-neutral-950: var(--color-slate-950);
+  /* Warm-slate neutrals (green-tinted, custom — not Tailwind gray) — DESIGN.md §2.2.
+     Spec name is `neutral-*`; the legacy `slate-*` aliases were removed in Phase H. */
+  --color-neutral-50: #f8faf9;
+  --color-neutral-100: #f0f3f1;
+  --color-neutral-200: #e3e8e5;
+  --color-neutral-300: #cdd4d0;
+  --color-neutral-400: #9ca8a2;
+  --color-neutral-500: #6b7872;
+  --color-neutral-600: #4d5852;
+  --color-neutral-700: #364039;
+  --color-neutral-800: #1f2722;
+  --color-neutral-900: #0f1612;
+  --color-neutral-950: #0a0f0d;
 
   /* Chart palette — DESIGN.md §8.20 */
   --color-chart-emerald: #10b981;

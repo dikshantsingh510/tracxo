@@ -14,7 +14,7 @@ export default async function MasterAuditPage() {
       <header>
         <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">
           Master audit log{" "}
-          <span className="font-normal text-muted-foreground text-lg">({rows.length})</span>
+          <span className="font-normal text-lg text-muted-foreground">({rows.length})</span>
         </h1>
         <p className="mt-1 text-muted-foreground text-sm">
           Every master action is recorded here. Most recent 100.

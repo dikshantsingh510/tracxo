@@ -1,13 +1,25 @@
 "use client";
 
-import { updateFeedbackStatus } from "@/lib/actions/feedback";
-import type { FeedbackStatus } from "@/lib/queries/feedback";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const SELECT_CLASS =
-  "h-8 rounded-md border border-input bg-transparent px-2 text-xs shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { updateFeedbackStatus } from "@/lib/actions/feedback";
+import type { FeedbackStatus } from "@/lib/queries/feedback";
+
+const OPTIONS: { value: FeedbackStatus; label: string }[] = [
+  { value: "new", label: "New" },
+  { value: "triaged", label: "Triaged" },
+  { value: "resolved", label: "Resolved" },
+  { value: "wont_fix", label: "Won't fix" },
+];
 
 export function FeedbackStatusSelect({
   id,
@@ -19,12 +31,11 @@ export function FeedbackStatusSelect({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
-  async function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const next = e.target.value as FeedbackStatus;
-    if (next === status) return;
+  async function onChange(next: string | null) {
+    if (!next || next === status) return;
     setBusy(true);
     try {
-      await updateFeedbackStatus({ id, status: next });
+      await updateFeedbackStatus({ id, status: next as FeedbackStatus });
       toast.success(`Marked ${next.replace("_", " ")}`);
       router.refresh();
     } catch (err) {
@@ -35,11 +46,17 @@ export function FeedbackStatusSelect({
   }
 
   return (
-    <select className={SELECT_CLASS} value={status} onChange={onChange} disabled={busy}>
-      <option value="new">New</option>
-      <option value="triaged">Triaged</option>
-      <option value="resolved">Resolved</option>
-      <option value="wont_fix">Won&apos;t fix</option>
-    </select>
+    <Select value={status} onValueChange={onChange} disabled={busy}>
+      <SelectTrigger size="sm" className="w-36">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {OPTIONS.map((o) => (
+          <SelectItem key={o.value} value={o.value}>
+            {o.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

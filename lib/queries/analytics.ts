@@ -3,7 +3,7 @@ import "server-only";
 import { db } from "@/lib/db/client";
 import { expenseCategories, expenses, user } from "@/lib/db/schema";
 import { and, eq, gte, isNull, sql } from "drizzle-orm";
-import { unstable_cache } from "next/cache";
+import { cachedJson } from "./cache";
 
 export const analyticsCacheTags = {
   workspaceAnalytics: (workspaceId: string) => `workspace:${workspaceId}:analytics`,
@@ -114,21 +114,21 @@ async function byPayerQuery(workspaceId: string): Promise<PayerTotal[]> {
 }
 
 export function getCategoryTotals(workspaceId: string): Promise<CategoryTotal[]> {
-  return unstable_cache(() => byCategoryQuery(workspaceId), ["analytics-category", workspaceId], {
+  return cachedJson(() => byCategoryQuery(workspaceId), ["analytics-category", workspaceId], {
     tags: [analyticsCacheTags.workspaceAnalytics(workspaceId)],
-  })();
+  });
 }
 
 export function getMonthTotals(workspaceId: string, months = 12): Promise<MonthTotal[]> {
-  return unstable_cache(
+  return cachedJson(
     () => byMonthQuery(workspaceId, months),
     ["analytics-month", workspaceId, String(months)],
     { tags: [analyticsCacheTags.workspaceAnalytics(workspaceId)] },
-  )();
+  );
 }
 
 export function getPayerTotals(workspaceId: string): Promise<PayerTotal[]> {
-  return unstable_cache(() => byPayerQuery(workspaceId), ["analytics-payer", workspaceId], {
+  return cachedJson(() => byPayerQuery(workspaceId), ["analytics-payer", workspaceId], {
     tags: [analyticsCacheTags.workspaceAnalytics(workspaceId)],
-  })();
+  });
 }

@@ -1,14 +1,26 @@
-import { AuthCard } from "@/components/auth/auth-card";
+import { Plus, Repeat2 } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Money } from "@/components/ui/money";
 import { requireSession } from "@/lib/auth/server";
-import { formatMoney } from "@/lib/money";
 import { listRecurring } from "@/lib/queries/recurring";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
 import { humanizeRRule } from "@/lib/recurring/rrule";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { RecurringActions } from "./recurring-actions";
 
 export const metadata = { title: "Recurring · Tracxo" };
+
+function fmtDate(d: Date) {
+  return new Date(d).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 export default async function RecurringPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -19,65 +31,69 @@ export default async function RecurringPage({ params }: { params: Promise<{ id: 
   const rows = await listRecurring(workspace.id);
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
-      <Link
-        href={`/workspaces/${workspace.id}/settings`}
-        className="inline-flex items-center text-emerald-700 text-sm underline-offset-4 hover:underline dark:text-emerald-400"
-      >
-        ← Workspace settings
-      </Link>
-      <AuthCard
-        title="Recurring expenses"
-        description={`${rows.length} template${rows.length === 1 ? "" : "s"}`}
-        footer={
-          <Link
-            href={`/workspaces/${workspace.id}/recurring/new`}
-            className="text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-400"
-          >
-            + New recurring expense
-          </Link>
-        }
-      >
-        {rows.length === 0 ? (
-          <p className="text-slate-600 text-sm dark:text-slate-400">
-            No templates yet. A recurring expense generates a fresh expense automatically on its
-            schedule.
+    <div className="mx-auto w-full max-w-3xl space-y-6">
+      <header className="flex items-end justify-between gap-3">
+        <div>
+          <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">
+            Recurring expenses
+          </h1>
+          <p className="mt-1 text-muted-foreground text-sm">
+            {rows.length} template{rows.length === 1 ? "" : "s"} · each generates an expense
+            automatically on its schedule.
           </p>
-        ) : (
-          <ul className="divide-y divide-slate-200/60 dark:divide-slate-800/60">
-            {rows.map((r) => (
-              <li key={r.id} className="py-3">
-                <div className="flex items-baseline justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="truncate font-medium text-slate-900 text-sm dark:text-slate-50">
-                      {r.description}
-                      {!r.active && (
-                        <span className="ml-2 rounded bg-slate-200/60 px-1.5 py-0.5 font-normal text-slate-600 text-xs dark:bg-slate-800/60 dark:text-slate-400">
-                          paused
-                        </span>
-                      )}
-                    </div>
-                    <div className="truncate text-slate-500 text-xs dark:text-slate-400">
-                      {humanizeRRule(r.rrule)} · {r.payerName} pays
-                    </div>
-                    <div className="truncate text-slate-500 text-xs dark:text-slate-400">
-                      next: {new Date(r.nextRunAt).toISOString().slice(0, 10)}
-                      {r.lastRunAt &&
-                        ` · last: ${new Date(r.lastRunAt).toISOString().slice(0, 10)}`}
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <div className="shrink-0 font-semibold text-emerald-700 text-sm dark:text-emerald-400">
-                      {formatMoney(r.amount, r.currency)}
-                    </div>
-                    <RecurringActions id={r.id} workspaceId={workspace.id} active={r.active} />
-                  </div>
+        </div>
+        <Button
+          nativeButton={false}
+          render={
+            <Link href={`/workspaces/${workspace.id}/recurring/new`}>
+              <Plus className="size-3.5" strokeWidth={2} aria-hidden />
+              New
+            </Link>
+          }
+        />
+      </header>
+
+      {rows.length === 0 ? (
+        <EmptyState
+          icon={Repeat2}
+          heading="No recurring expenses yet"
+          body="Set up a template for rent, subscriptions, or any expense that repeats — Tracxo creates each one for you on schedule."
+          cta={{
+            label: "New recurring expense",
+            href: `/workspaces/${workspace.id}/recurring/new`,
+          }}
+        />
+      ) : (
+        <ul className="surface-acrylic-light divide-y divide-border overflow-hidden rounded-2xl">
+          {rows.map((r) => (
+            <li key={r.id} className="hover-tint flex items-start justify-between gap-4 px-5 py-4">
+              <div className="min-w-0 space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="truncate font-medium text-foreground text-sm">
+                    {r.description}
+                  </span>
+                  {!r.active ? (
+                    <Badge variant="neutral" size="xs">
+                      Paused
+                    </Badge>
+                  ) : null}
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </AuthCard>
+                <div className="truncate text-muted-foreground text-xs">
+                  {humanizeRRule(r.rrule)} · {r.payerName} pays
+                </div>
+                <div className="truncate text-muted-foreground text-xs">
+                  Next {fmtDate(r.nextRunAt)}
+                  {r.lastRunAt ? ` · last ${fmtDate(r.lastRunAt)}` : ""}
+                </div>
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                <Money amount={r.amount} currency={r.currency} className="font-semibold text-sm" />
+                <RecurringActions id={r.id} workspaceId={workspace.id} active={r.active} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

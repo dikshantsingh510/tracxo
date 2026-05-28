@@ -1,21 +1,34 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { createRecurring } from "@/lib/actions/recurring";
-import { currencyCodeEnum } from "@/lib/db/schema/auth";
-import { parseAmountMinor } from "@/lib/money";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { MorphButton } from "@/components/ui/morph-button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createRecurring } from "@/lib/actions/recurring";
+import { currencyCodeEnum } from "@/lib/db/schema/auth";
+import { parseAmountMinor } from "@/lib/money";
 
 type Member = { userId: string; name: string; email: string };
 type Category = { id: string; name: string };
 type Freq = "daily" | "weekly" | "monthly" | "yearly";
 
-const SELECT_CLASS =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+const FREQ_LABEL: Record<Freq, string> = {
+  daily: "Daily",
+  weekly: "Weekly",
+  monthly: "Monthly",
+  yearly: "Yearly",
+};
 
 export function RecurringForm({
   workspaceId,
@@ -46,20 +59,28 @@ export function RecurringForm({
   const [participants, setParticipants] = useState<Set<string>>(
     () => new Set(members.map((m) => m.userId)),
   );
-  const [busy, setBusy] = useState(false);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!description.trim()) return toast.error("Description is required");
+  async function doSubmit() {
+    if (!description.trim()) {
+      toast.error("Description is required");
+      throw new Error("invalid");
+    }
     const amount = parseAmountMinor(amountStr, currency);
-    if (amount === null || amount <= 0n) return toast.error("Enter a positive amount");
+    if (amount === null || amount <= 0n) {
+      toast.error("Enter a positive amount");
+      throw new Error("invalid");
+    }
     const intervalN = Number(interval);
-    if (!Number.isInteger(intervalN) || intervalN < 1)
-      return toast.error("Interval must be a whole number");
+    if (!Number.isInteger(intervalN) || intervalN < 1) {
+      toast.error("Interval must be a whole number");
+      throw new Error("invalid");
+    }
     const ids = Array.from(participants);
-    if (ids.length === 0) return toast.error("Pick at least one participant");
+    if (ids.length === 0) {
+      toast.error("Pick at least one participant");
+      throw new Error("invalid");
+    }
 
-    setBusy(true);
     try {
       await createRecurring({
         workspaceId,
@@ -70,158 +91,224 @@ export function RecurringForm({
         categoryId: categoryId || undefined,
         notes: notes.trim() || undefined,
         split: { mode: "equal", participantIds: ids },
-        schedule: {
-          freq,
-          interval: intervalN,
-          dtstart,
-          until: until || undefined,
-        },
+        schedule: { freq, interval: intervalN, dtstart, until: until || undefined },
       });
       toast.success("Recurring expense created");
       router.push(`/workspaces/${workspaceId}/recurring`);
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save");
-      setBusy(false);
+      throw err;
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <Field label="Description">
-        <Input
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Rent"
-          maxLength={200}
-        />
-      </Field>
+    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+      <Tabs defaultValue="basics">
+        <TabsList variant="line" className="w-full">
+          <TabsTrigger value="basics">Basics</TabsTrigger>
+          <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          <TabsTrigger value="split">Split</TabsTrigger>
+        </TabsList>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Amount">
-          <Input
-            value={amountStr}
-            onChange={(e) => setAmountStr(e.target.value)}
-            placeholder="0.00"
-            inputMode="decimal"
-          />
-        </Field>
-        <Field label="Currency">
-          <select
-            className={SELECT_CLASS}
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-          >
-            {currencyCodeEnum.enumValues.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </Field>
-      </div>
+        {/* Basics */}
+        <TabsContent value="basics" className="mt-6 space-y-4">
+          <Field label="Description" htmlFor="rec-desc">
+            <Input
+              id="rec-desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Rent"
+              maxLength={200}
+              className="h-11 rounded-xl"
+            />
+          </Field>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Paid by">
-          <select
-            className={SELECT_CLASS}
-            value={payerId}
-            onChange={(e) => setPayerId(e.target.value)}
-          >
-            {members.map((m) => (
-              <option key={m.userId} value={m.userId}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label="Category (optional)">
-          <select
-            className={SELECT_CLASS}
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-          >
-            <option value="">— Uncategorized —</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </Field>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Field label="Frequency">
-          <select
-            className={SELECT_CLASS}
-            value={freq}
-            onChange={(e) => setFreq(e.target.value as Freq)}
-          >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-          </select>
-        </Field>
-        <Field label="Every">
-          <Input
-            inputMode="numeric"
-            value={interval}
-            onChange={(e) => setInterval(e.target.value)}
-          />
-        </Field>
-        <Field label="Starts on">
-          <Input type="date" value={dtstart} onChange={(e) => setDtstart(e.target.value)} />
-        </Field>
-        <Field label="Ends on (optional)">
-          <Input type="date" value={until} onChange={(e) => setUntil(e.target.value)} />
-        </Field>
-      </div>
-
-      <div className="space-y-2 rounded-md border border-slate-200/70 p-3 dark:border-slate-800/70">
-        <Label className="text-slate-700 text-xs dark:text-slate-300">Split equally between</Label>
-        {members.map((m) => {
-          const checked = participants.has(m.userId);
-          return (
-            <label key={m.userId} className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={(e) => {
-                  const next = new Set(participants);
-                  if (e.target.checked) next.add(m.userId);
-                  else next.delete(m.userId);
-                  setParticipants(next);
-                }}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Field label="Amount" htmlFor="rec-amount">
+              <Input
+                id="rec-amount"
+                value={amountStr}
+                onChange={(e) => setAmountStr(e.target.value)}
+                placeholder="0.00"
+                inputMode="decimal"
+                className="h-11 rounded-xl"
               />
-              <span className="text-slate-900 dark:text-slate-50">{m.name}</span>
-              <span className="text-slate-500 text-xs dark:text-slate-400">{m.email}</span>
-            </label>
-          );
-        })}
-      </div>
+            </Field>
+            <Field label="Currency">
+              <Select value={currency} onValueChange={(v) => v && setCurrency(v)}>
+                <SelectTrigger className="h-11 w-full rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {currencyCodeEnum.enumValues.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
 
-      <Field label="Notes (optional)">
-        <textarea
-          className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          maxLength={2000}
-        />
-      </Field>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Field label="Paid by">
+              <Select value={payerId} onValueChange={(v) => v && setPayerId(v)}>
+                <SelectTrigger className="h-11 w-full rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.userId} value={m.userId}>
+                      {m.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Category (optional)">
+              <Select
+                value={categoryId || "none"}
+                onValueChange={(v) => setCategoryId(v && v !== "none" ? v : "")}
+              >
+                <SelectTrigger className="h-11 w-full rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Uncategorized</SelectItem>
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
 
-      <Button type="submit" disabled={busy} className="w-full">
-        {busy ? "Saving…" : "Create recurring expense"}
-      </Button>
+          <Field label="Notes (optional)" htmlFor="rec-notes">
+            <textarea
+              id="rec-notes"
+              className="flex min-h-[72px] w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              maxLength={2000}
+            />
+          </Field>
+        </TabsContent>
+
+        {/* Schedule */}
+        <TabsContent value="schedule" className="mt-6 space-y-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Field label="Frequency">
+              <Select value={freq} onValueChange={(v) => v && setFreq(v as Freq)}>
+                <SelectTrigger className="h-11 w-full rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(FREQ_LABEL) as Freq[]).map((f) => (
+                    <SelectItem key={f} value={f}>
+                      {FREQ_LABEL[f]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Repeat every" htmlFor="rec-interval">
+              <Input
+                id="rec-interval"
+                inputMode="numeric"
+                value={interval}
+                onChange={(e) => setInterval(e.target.value)}
+                className="h-11 rounded-xl"
+              />
+            </Field>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Field label="Starts on" htmlFor="rec-start">
+              <Input
+                id="rec-start"
+                type="date"
+                value={dtstart}
+                onChange={(e) => setDtstart(e.target.value)}
+                className="h-11 rounded-xl"
+              />
+            </Field>
+            <Field label="Ends on (optional)" htmlFor="rec-end">
+              <Input
+                id="rec-end"
+                type="date"
+                value={until}
+                onChange={(e) => setUntil(e.target.value)}
+                className="h-11 rounded-xl"
+              />
+            </Field>
+          </div>
+        </TabsContent>
+
+        {/* Split */}
+        <TabsContent value="split" className="mt-6 space-y-3">
+          <p className="text-muted-foreground text-sm">
+            Split equally between the people you pick.
+          </p>
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border">
+            {members.map((m) => {
+              const checked = participants.has(m.userId);
+              return (
+                <li key={m.userId}>
+                  <label className="hover-tint flex cursor-pointer items-center gap-3 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) => {
+                        const next = new Set(participants);
+                        if (e.target.checked) next.add(m.userId);
+                        else next.delete(m.userId);
+                        setParticipants(next);
+                      }}
+                      className="size-4 accent-emerald-600"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium text-foreground text-sm">
+                        {m.name}
+                      </span>
+                      <span className="block truncate text-muted-foreground text-xs">
+                        {m.email}
+                      </span>
+                    </span>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </TabsContent>
+      </Tabs>
+
+      <MorphButton
+        className="w-full"
+        idle="Create recurring expense"
+        pending="Saving…"
+        success="Created"
+        onAction={doSubmit}
+      />
     </form>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  htmlFor,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-slate-700 text-xs dark:text-slate-300">{label}</Label>
+      <Label htmlFor={htmlFor} className="text-muted-foreground text-xs">
+        {label}
+      </Label>
       {children}
     </div>
   );

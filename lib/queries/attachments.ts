@@ -3,7 +3,7 @@ import "server-only";
 import { db } from "@/lib/db/client";
 import { expenseAttachments, user } from "@/lib/db/schema";
 import { asc, eq } from "drizzle-orm";
-import { unstable_cache } from "next/cache";
+import { cachedJson } from "./cache";
 
 export const attachmentCacheTags = {
   expenseAttachments: (expenseId: string) => `expense:${expenseId}:attachments`,
@@ -37,7 +37,7 @@ async function listAttachmentsQuery(expenseId: string): Promise<AttachmentRow[]>
 }
 
 export function listAttachments(expenseId: string): Promise<AttachmentRow[]> {
-  return unstable_cache(() => listAttachmentsQuery(expenseId), ["expense-attachments", expenseId], {
+  return cachedJson(() => listAttachmentsQuery(expenseId), ["expense-attachments", expenseId], {
     tags: [attachmentCacheTags.expenseAttachments(expenseId)],
-  })();
+  });
 }

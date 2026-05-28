@@ -11,6 +11,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createInvitation } from "@/lib/actions/members";
 import { type CreateInvitationInput, createInvitationSchema } from "@/lib/validation/member";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,9 +25,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-const selectClass =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
 export function InviteForm({ workspaceId }: { workspaceId: string }) {
   const router = useRouter();
@@ -84,10 +88,15 @@ export function InviteForm({ workspaceId }: { workspaceId: string }) {
             <FormItem>
               <FormLabel>Role</FormLabel>
               <FormControl>
-                <select {...field} className={selectClass}>
-                  <option value="member">Member</option>
-                  <option value="admin">Admin</option>
-                </select>
+                <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
+                  <SelectTrigger className="h-9 w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="member">Member</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormDescription>
                 Members can add expenses. Admins can also invite and manage settings.

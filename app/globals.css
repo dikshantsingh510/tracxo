@@ -480,6 +480,9 @@
   }
   html {
     scroll-behavior: smooth;
+    /* Non-static so motion's useScroll element-target offset math has a
+       positioned scroll container (silences dev-only warning). */
+    position: relative;
   }
   /* Surface Tier 1 — "Mica" page background. DESIGN.md §2.4 */
   body {

@@ -3,6 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createSettlement } from "@/lib/actions/settlements";
 import { currencyCodeEnum } from "@/lib/db/schema/auth";
 import { minorToDecimalString, parseAmountMinor } from "@/lib/money";
@@ -13,9 +20,6 @@ import { toast } from "sonner";
 
 type Member = { userId: string; name: string; email: string };
 type Method = "upi" | "cash" | "bank_transfer" | "other";
-
-const SELECT_CLASS =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
 export function SettlementForm({
   workspaceId,
@@ -104,31 +108,33 @@ export function SettlementForm({
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <Field label="From">
-          <select
-            className={SELECT_CLASS}
-            value={fromUserId}
-            onChange={(e) => setFromUserId(e.target.value)}
-          >
-            {members.map((m) => (
-              <option key={m.userId} value={m.userId}>
-                {m.name}
-                {m.userId === actorUserId ? " (you)" : ""}
-              </option>
-            ))}
-          </select>
+          <Select value={fromUserId} onValueChange={(v) => v && setFromUserId(v)}>
+            <SelectTrigger className="h-9 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {members.map((m) => (
+                <SelectItem key={m.userId} value={m.userId}>
+                  {m.name}
+                  {m.userId === actorUserId ? " (you)" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
         <Field label="To">
-          <select
-            className={SELECT_CLASS}
-            value={toUserId}
-            onChange={(e) => setToUserId(e.target.value)}
-          >
-            {members.map((m) => (
-              <option key={m.userId} value={m.userId}>
-                {m.name}
-              </option>
-            ))}
-          </select>
+          <Select value={toUserId} onValueChange={(v) => v && setToUserId(v)}>
+            <SelectTrigger className="h-9 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {members.map((m) => (
+                <SelectItem key={m.userId} value={m.userId}>
+                  {m.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
       </div>
 
@@ -142,32 +148,34 @@ export function SettlementForm({
           />
         </Field>
         <Field label="Currency">
-          <select
-            className={SELECT_CLASS}
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-          >
-            {currencyCodeEnum.enumValues.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          <Select value={currency} onValueChange={(v) => v && setCurrency(v)}>
+            <SelectTrigger className="h-9 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {currencyCodeEnum.enumValues.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="Method">
-          <select
-            className={SELECT_CLASS}
-            value={method}
-            onChange={(e) => setMethod(e.target.value as Method)}
-          >
-            <option value="upi">UPI</option>
-            <option value="cash">Cash</option>
-            <option value="bank_transfer">Bank transfer</option>
-            <option value="other">Other</option>
-          </select>
+          <Select value={method} onValueChange={(v) => v && setMethod(v as Method)}>
+            <SelectTrigger className="h-9 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="upi">UPI</SelectItem>
+              <SelectItem value="cash">Cash</SelectItem>
+              <SelectItem value="bank_transfer">Bank transfer</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
         </Field>
         <Field label="Settled on">
           <Input type="date" value={settledAt} onChange={(e) => setSettledAt(e.target.value)} />

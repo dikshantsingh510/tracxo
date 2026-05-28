@@ -3,6 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createFeedback } from "@/lib/actions/feedback";
 import { type CreateFeedbackInput, createFeedbackSchema } from "@/lib/validation/feedback";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,9 +17,6 @@ import { MessageSquare } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-const SELECT_CLASS =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
 export function FeedbackWidget() {
   const [open, setOpen] = useState(false);
@@ -72,12 +76,20 @@ export function FeedbackWidget() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="mt-3 space-y-3">
             <div className="space-y-1.5">
               <Label className="text-neutral-700 text-xs dark:text-neutral-300">Type</Label>
-              <select className={SELECT_CLASS} {...form.register("type")}>
-                <option value="bug">Bug</option>
-                <option value="idea">Idea</option>
-                <option value="general">General</option>
-                <option value="praise">Praise</option>
-              </select>
+              <Select
+                value={form.watch("type")}
+                onValueChange={(v) => v && form.setValue("type", v as CreateFeedbackInput["type"])}
+              >
+                <SelectTrigger className="h-9 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bug">Bug</SelectItem>
+                  <SelectItem value="idea">Idea</SelectItem>
+                  <SelectItem value="general">General</SelectItem>
+                  <SelectItem value="praise">Praise</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label className="text-neutral-700 text-xs dark:text-neutral-300">Message</Label>

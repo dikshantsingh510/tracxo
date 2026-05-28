@@ -9,7 +9,7 @@ import {
   workspaceMembers,
 } from "@/lib/db/schema";
 import { and, desc, eq, isNull } from "drizzle-orm";
-import { unstable_cache } from "next/cache";
+import { cachedJson } from "./cache";
 
 export const expenseCacheTags = {
   workspaceExpenses: (workspaceId: string) => `workspace:${workspaceId}:expenses`,
@@ -65,9 +65,9 @@ async function listExpensesQuery(workspaceId: string): Promise<ExpenseRow[]> {
 }
 
 export function listExpenses(workspaceId: string): Promise<ExpenseRow[]> {
-  return unstable_cache(() => listExpensesQuery(workspaceId), ["workspace-expenses", workspaceId], {
+  return cachedJson(() => listExpensesQuery(workspaceId), ["workspace-expenses", workspaceId], {
     tags: [expenseCacheTags.workspaceExpenses(workspaceId)],
-  })();
+  });
 }
 
 export type ExpenseSplitRow = {
@@ -142,9 +142,9 @@ async function getExpenseQuery(
 // Membership check is performed by the caller (page/action) before calling
 // this — we don't want to leak per-user info into the per-expense cache key.
 export function getExpense(expenseId: string, workspaceId: string): Promise<ExpenseDetail | null> {
-  return unstable_cache(() => getExpenseQuery(expenseId, workspaceId), ["expense", expenseId], {
+  return cachedJson(() => getExpenseQuery(expenseId, workspaceId), ["expense", expenseId], {
     tags: [expenseCacheTags.expense(expenseId), expenseCacheTags.workspaceExpenses(workspaceId)],
-  })();
+  });
 }
 
 // Lightweight helper used by actions and pages — checks the caller is a

@@ -3,7 +3,7 @@ import "server-only";
 import { db } from "@/lib/db/client";
 import { expenseCategories, recurringExpenses, user } from "@/lib/db/schema";
 import { and, asc, eq } from "drizzle-orm";
-import { unstable_cache } from "next/cache";
+import { cachedJson } from "./cache";
 
 export const recurringCacheTags = {
   workspaceRecurring: (workspaceId: string) => `workspace:${workspaceId}:recurring`,
@@ -56,11 +56,9 @@ async function listRecurringQuery(workspaceId: string): Promise<RecurringRow[]> 
 }
 
 export function listRecurring(workspaceId: string): Promise<RecurringRow[]> {
-  return unstable_cache(
-    () => listRecurringQuery(workspaceId),
-    ["workspace-recurring", workspaceId],
-    { tags: [recurringCacheTags.workspaceRecurring(workspaceId)] },
-  )();
+  return cachedJson(() => listRecurringQuery(workspaceId), ["workspace-recurring", workspaceId], {
+    tags: [recurringCacheTags.workspaceRecurring(workspaceId)],
+  });
 }
 
 export async function getRecurringTemplate(id: string, workspaceId: string) {

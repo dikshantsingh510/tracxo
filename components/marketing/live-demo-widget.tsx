@@ -115,6 +115,7 @@ export function LiveDemoWidget() {
             <Button
               variant="ghost"
               size="sm"
+              nativeButton={false}
               render={
                 <Link href="/signup" className="inline-flex items-center gap-1.5">
                   Try the real thing

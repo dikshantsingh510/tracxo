@@ -78,7 +78,7 @@ export function Pricing() {
       <SectionReveal delay={0.15}>
         <div className="surface-acrylic-light mt-8 overflow-hidden rounded-2xl p-6 sm:p-8">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
-            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-emerald-500/30 shadow-lg">
               <Sparkles className="size-6" strokeWidth={1.75} aria-hidden />
             </span>
             <div className="flex-1 space-y-4 text-center sm:text-left">

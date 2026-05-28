@@ -51,23 +51,23 @@ export function CommentsThread({
   return (
     <div className="space-y-3">
       {initial.length === 0 ? (
-        <p className="text-slate-500 text-sm dark:text-slate-400">No comments yet.</p>
+        <p className="text-neutral-500 text-sm dark:text-neutral-400">No comments yet.</p>
       ) : (
         <ul className="space-y-3">
           {initial.map((c) => (
             <li
               key={c.id}
-              className="rounded-md border border-slate-200/60 p-3 dark:border-slate-800/60"
+              className="rounded-md border border-neutral-200/60 p-3 dark:border-neutral-800/60"
             >
               <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="font-medium text-slate-700 dark:text-slate-300">
+                <span className="font-medium text-neutral-700 dark:text-neutral-300">
                   {c.authorName ?? "Removed user"}
                 </span>
-                <span className="text-slate-500 dark:text-slate-400">
+                <span className="text-neutral-500 dark:text-neutral-400">
                   {new Date(c.createdAt).toLocaleString()}
                 </span>
               </div>
-              <p className="mt-1.5 whitespace-pre-wrap text-slate-900 text-sm dark:text-slate-50">
+              <p className="mt-1.5 whitespace-pre-wrap text-neutral-900 text-sm dark:text-neutral-50">
                 {c.body}
               </p>
               {c.authorId === currentUserId && (

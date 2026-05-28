@@ -44,7 +44,7 @@ export default async function MasterFeedbackPage({
         <div>
           <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">
             Feedback{" "}
-            <span className="font-normal text-muted-foreground text-lg">({rows.length})</span>
+            <span className="font-normal text-lg text-muted-foreground">({rows.length})</span>
           </h1>
           <p className="mt-1 text-muted-foreground text-sm">
             User-submitted bugs, ideas, and notes.

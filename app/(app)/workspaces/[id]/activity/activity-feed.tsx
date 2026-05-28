@@ -72,23 +72,25 @@ export function ActivityFeed({
       <div className="flex items-center gap-2 text-xs">
         <span
           aria-hidden
-          className={`inline-block size-2 rounded-full ${connected ? "bg-emerald-500" : "bg-slate-400"}`}
+          className={`inline-block size-2 rounded-full ${connected ? "bg-emerald-500" : "bg-neutral-400"}`}
         />
-        <span className="text-slate-500 dark:text-slate-400">
+        <span className="text-neutral-500 dark:text-neutral-400">
           {connected ? "Live" : "Reconnecting…"}
         </span>
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-slate-600 text-sm dark:text-slate-400">
+        <p className="text-neutral-600 text-sm dark:text-neutral-400">
           No activity yet. Add an expense or invite someone to see this fill up.
         </p>
       ) : (
-        <ol className="divide-y divide-slate-200/60 dark:divide-slate-800/60">
+        <ol className="divide-y divide-neutral-200/60 dark:divide-neutral-800/60">
           {rows.map((r) => (
             <li key={r.id} className="py-3">
-              <div className="text-slate-900 text-sm dark:text-slate-50">{formatActivity(r)}</div>
-              <div className="mt-0.5 text-slate-500 text-xs dark:text-slate-400">
+              <div className="text-neutral-900 text-sm dark:text-neutral-50">
+                {formatActivity(r)}
+              </div>
+              <div className="mt-0.5 text-neutral-500 text-xs dark:text-neutral-400">
                 {timeAgo(r.createdAt, now)}
               </div>
             </li>

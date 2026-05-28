@@ -85,13 +85,13 @@ export function AttachmentsSection({
   return (
     <div className="space-y-3">
       {initial.length === 0 ? (
-        <p className="text-slate-500 text-sm dark:text-slate-400">No attachments.</p>
+        <p className="text-neutral-500 text-sm dark:text-neutral-400">No attachments.</p>
       ) : (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {initial.map((a) => (
             <li
               key={a.id}
-              className="overflow-hidden rounded-md border border-slate-200/60 dark:border-slate-800/60"
+              className="overflow-hidden rounded-md border border-neutral-200/60 dark:border-neutral-800/60"
             >
               {a.contentType.startsWith("image/") ? (
                 <a href={a.blobUrl} target="_blank" rel="noreferrer" className="block">
@@ -108,13 +108,13 @@ export function AttachmentsSection({
                   href={a.blobUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex aspect-square w-full items-center justify-center bg-slate-100 text-slate-600 text-xs dark:bg-slate-900 dark:text-slate-400"
+                  className="flex aspect-square w-full items-center justify-center bg-neutral-100 text-neutral-600 text-xs dark:bg-neutral-900 dark:text-neutral-400"
                 >
                   PDF
                 </a>
               )}
               <div className="flex items-center justify-between gap-2 px-2 py-1.5 text-xs">
-                <span className="text-slate-600 dark:text-slate-400">
+                <span className="text-neutral-600 dark:text-neutral-400">
                   {formatBytes(a.byteSize)}
                 </span>
                 <button

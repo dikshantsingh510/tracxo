@@ -316,7 +316,7 @@ export function ExpenseForm(
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-slate-700 text-xs dark:text-slate-300">{label}</Label>
+      <Label className="text-neutral-700 text-xs dark:text-neutral-300">{label}</Label>
       {children}
     </div>
   );
@@ -339,7 +339,7 @@ function SplitEditor({
 }) {
   if (mode === "equal") {
     return (
-      <div className="space-y-2 rounded-md border border-slate-200/70 p-3 dark:border-slate-800/70">
+      <div className="space-y-2 rounded-md border border-neutral-200/70 p-3 dark:border-neutral-800/70">
         {members.map((m) => {
           const checked = equalParticipants.has(m.userId);
           return (
@@ -354,8 +354,8 @@ function SplitEditor({
                   setEqualParticipants(next);
                 }}
               />
-              <span className="text-slate-900 dark:text-slate-50">{m.name}</span>
-              <span className="text-slate-500 text-xs dark:text-slate-400">{m.email}</span>
+              <span className="text-neutral-900 dark:text-neutral-50">{m.name}</span>
+              <span className="text-neutral-500 text-xs dark:text-neutral-400">{m.email}</span>
             </label>
           );
         })}
@@ -366,10 +366,10 @@ function SplitEditor({
   const placeholder = mode === "percentage" ? "%" : mode === "share" ? "units" : "0.00";
 
   return (
-    <div className="space-y-2 rounded-md border border-slate-200/70 p-3 dark:border-slate-800/70">
+    <div className="space-y-2 rounded-md border border-neutral-200/70 p-3 dark:border-neutral-800/70">
       {members.map((m) => (
         <div key={m.userId} className="flex items-center gap-3 text-sm">
-          <div className="flex-1 truncate text-slate-900 dark:text-slate-50">{m.name}</div>
+          <div className="flex-1 truncate text-neutral-900 dark:text-neutral-50">{m.name}</div>
           <Input
             className="w-32"
             inputMode={mode === "share" ? "numeric" : "decimal"}

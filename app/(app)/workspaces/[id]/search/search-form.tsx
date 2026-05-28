@@ -88,7 +88,7 @@ function Field({
 }) {
   return (
     <div className={`space-y-1.5 ${className ?? ""}`.trim()}>
-      <Label className="text-slate-700 text-xs dark:text-slate-300">{label}</Label>
+      <Label className="text-neutral-700 text-xs dark:text-neutral-300">{label}</Label>
       {children}
     </div>
   );

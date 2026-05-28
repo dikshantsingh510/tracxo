@@ -11,7 +11,7 @@ export default async function MasterUsersPage() {
     <div className="space-y-5">
       <header>
         <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">
-          Users <span className="font-normal text-muted-foreground text-lg">({rows.length})</span>
+          Users <span className="font-normal text-lg text-muted-foreground">({rows.length})</span>
         </h1>
         <p className="mt-1 text-muted-foreground text-sm">Most recent 50 accounts.</p>
       </header>

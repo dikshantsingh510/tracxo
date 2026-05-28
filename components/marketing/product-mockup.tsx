@@ -51,7 +51,7 @@ export function ProductMockup({ className }: { className?: string }) {
         className={cn(
           "surface-acrylic-heavy relative overflow-hidden rounded-2xl p-5 shadow-2xl",
           // Slight rotation for that "casually placed" feel
-          reduce ? "" : "rotate-y-[-6deg] rotate-x-[2deg]",
+          reduce ? "" : "rotate-x-[2deg] rotate-y-[-6deg]",
           "[transform-style:preserve-3d]",
         )}
       >
@@ -74,7 +74,7 @@ export function ProductMockup({ className }: { className?: string }) {
             {PREVIEW.map((row) => (
               <li
                 key={row.name}
-                className="flex items-center justify-between rounded-lg px-2 py-1.5 hover-tint"
+                className="hover-tint flex items-center justify-between rounded-lg px-2 py-1.5"
               >
                 <span className="flex items-center gap-2">
                   <span className="grid size-7 place-items-center rounded-full bg-emerald-100 font-medium text-emerald-700 text-xs dark:bg-emerald-900/40 dark:text-emerald-300">

@@ -22,14 +22,14 @@ function WorkspaceCard({ workspace }: { workspace: UserWorkspace }) {
     <Link
       href={`/workspaces/${workspace.id}/expenses`}
       className={cn(
-        "surface-acrylic-light group block rounded-2xl p-5 transition-all duration-200",
+        "surface-acrylic-light group block rounded-2xl p-5 transition duration-200",
         "@media (hover: hover) and (pointer: fine) hover:-translate-y-0.5 hover:shadow-md",
         "active:scale-[0.99]",
         archived && "opacity-70",
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3 min-w-0">
+        <div className="flex min-w-0 items-start gap-3">
           <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 font-semibold text-base text-white shadow-sm">
             {workspaceInitial(workspace)}
           </span>

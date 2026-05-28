@@ -12,7 +12,7 @@ export default async function MasterWorkspacesPage() {
       <header>
         <h1 className="font-semibold text-3xl text-foreground tracking-[-0.02em]">
           Workspaces{" "}
-          <span className="font-normal text-muted-foreground text-lg">({rows.length})</span>
+          <span className="font-normal text-lg text-muted-foreground">({rows.length})</span>
         </h1>
         <p className="mt-1 text-muted-foreground text-sm">
           Force-archive is logged in the master audit log.

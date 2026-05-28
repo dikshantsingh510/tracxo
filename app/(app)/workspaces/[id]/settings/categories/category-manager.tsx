@@ -52,7 +52,7 @@ function ColorPicker({
             type="button"
             onClick={() => onChange(s)}
             className={cn(
-              "size-6 rounded-full ring-2 ring-transparent transition-all hover:scale-110",
+              "size-6 rounded-full ring-2 ring-transparent transition hover:scale-110",
               value === s && "ring-foreground/40",
             )}
             style={{ backgroundColor: s }}
@@ -198,7 +198,7 @@ export function CategoryManager({
                   key={row.id}
                   className="hover-tint flex items-center justify-between gap-3 px-5 py-3.5"
                 >
-                  <div className="flex items-center gap-3 min-w-0 text-sm">
+                  <div className="flex min-w-0 items-center gap-3 text-sm">
                     <span
                       className="inline-block size-5 shrink-0 rounded-full border border-border"
                       style={{ backgroundColor: row.color ?? "transparent" }}

@@ -25,7 +25,7 @@ export function TrustStrip() {
         {/* Edge fade masks */}
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-background to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-background to-transparent" />
-        <div className="flex w-max items-center gap-12 animate-marquee whitespace-nowrap text-muted-foreground text-sm">
+        <div className="flex w-max animate-marquee items-center gap-12 whitespace-nowrap text-muted-foreground text-sm">
           {/* Doubled so the loop is seamless at -50% translate */}
           {[
             ...NAMES.map((n) => ({ n, k: `a-${n}` })),

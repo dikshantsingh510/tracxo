@@ -13,7 +13,7 @@ export function Hero() {
       <AnimatedMeshBg />
       <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.2fr_1fr]">
         {/* Left: copy + CTA */}
-        <div className="flex flex-col items-start gap-6 text-left stagger">
+        <div className="stagger flex flex-col items-start gap-6 text-left">
           <span className="surface-emerald-frosted inline-flex items-center gap-2 rounded-full px-3 py-1 font-medium text-emerald-700 text-xs dark:text-emerald-300">
             ✨ Now with UPI deep-link checkout
           </span>

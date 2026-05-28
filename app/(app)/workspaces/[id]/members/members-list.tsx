@@ -92,7 +92,7 @@ export function MembersList({
               key={m.id}
               className="hover-tint flex flex-col items-stretch gap-3 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="flex items-center gap-3 min-w-0">
+              <div className="flex min-w-0 items-center gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-full bg-emerald-100 font-semibold text-emerald-700 text-sm dark:bg-emerald-900/40 dark:text-emerald-300">
                   {m.name.trim()[0]?.toUpperCase() ?? "?"}
                 </span>

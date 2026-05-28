@@ -1,10 +1,11 @@
-import { AuthCard } from "@/components/auth/auth-card";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
 import { requireSession } from "@/lib/auth/server";
 import { listCategories } from "@/lib/queries/categories";
 import { getWorkspaceMembers } from "@/lib/queries/members";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { RecurringForm } from "../recurring-form";
 
 export const metadata = { title: "New recurring expense · Tracxo" };
@@ -18,17 +19,24 @@ export default async function NewRecurringPage({ params }: { params: Promise<{ i
   const categories = await listCategories(workspace.id);
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4">
-      <Link
-        href={`/workspaces/${workspace.id}/recurring`}
-        className="inline-flex items-center text-emerald-700 text-sm underline-offset-4 hover:underline dark:text-emerald-400"
-      >
-        ← Recurring
-      </Link>
-      <AuthCard
-        title="New recurring expense"
-        description="Generates an expense on the schedule you set."
-      >
+    <div className="mx-auto w-full max-w-2xl space-y-6">
+      <div>
+        <Link
+          href={`/workspaces/${workspace.id}/recurring`}
+          className="inline-flex items-center gap-1 text-muted-foreground text-sm transition-colors hover:text-foreground"
+        >
+          <ChevronLeft className="size-4" strokeWidth={1.75} aria-hidden />
+          Recurring
+        </Link>
+        <h1 className="mt-2 font-semibold text-3xl text-foreground tracking-[-0.02em]">
+          New recurring expense
+        </h1>
+        <p className="mt-1 text-muted-foreground text-sm">
+          Generates an expense automatically on the schedule you set.
+        </p>
+      </div>
+
+      <div className="surface-acrylic-light rounded-2xl p-5 sm:p-6">
         <RecurringForm
           workspaceId={workspace.id}
           workspaceCurrency={workspace.defaultCurrency}
@@ -36,7 +44,7 @@ export default async function NewRecurringPage({ params }: { params: Promise<{ i
           members={members.map((m) => ({ userId: m.userId, name: m.name, email: m.email }))}
           categories={categories.map((c) => ({ id: c.id, name: c.name }))}
         />
-      </AuthCard>
+      </div>
     </div>
   );
 }

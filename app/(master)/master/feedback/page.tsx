@@ -69,9 +69,9 @@ export default async function MasterFeedbackPage({
           }
         />
       ) : (
-        <ul className="space-y-3">
+        <ul className="surface-acrylic-light divide-y divide-border overflow-hidden rounded-2xl">
           {rows.map((r) => (
-            <li key={r.id} className="surface-acrylic-light rounded-2xl p-4">
+            <li key={r.id} className="p-4">
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <Badge variant={TYPE_VARIANT[r.type]} size="xs" className="capitalize">
                   {r.type}

@@ -76,13 +76,13 @@ function SelectContent({
         align={align}
         alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
-        className="isolate z-50"
+        className="isolate z-[var(--z-dropdown)]"
       >
         <SelectPrimitive.Popup
           data-slot="select-content"
           data-align-trigger={alignItemWithTrigger}
           className={cn(
-            "data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 relative isolate z-50 max-h-(--available-height) w-(--anchor-width) min-w-36 origin-(--transform-origin) surface-acrylic-heavy overflow-y-auto overflow-x-hidden rounded-lg text-popover-foreground duration-100 data-[align-trigger=true]:animate-none data-closed:animate-out data-open:animate-in",
+            "data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 relative isolate z-[var(--z-dropdown)] max-h-(--available-height) w-(--anchor-width) min-w-36 origin-(--transform-origin) surface-acrylic-heavy overflow-y-auto overflow-x-hidden rounded-lg text-popover-foreground duration-100 data-[align-trigger=true]:animate-none data-closed:animate-out data-open:animate-in",
             className,
           )}
           {...props}

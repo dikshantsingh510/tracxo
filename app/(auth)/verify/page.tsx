@@ -1,5 +1,6 @@
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { safeRedirectPath } from "@/lib/validation/redirect";
 import { VerifyForm } from "./verify-form";
 
 export const metadata = { title: "Verify email · Tracxo" };
@@ -10,7 +11,7 @@ export default async function VerifyPage({
   searchParams: Promise<{ email?: string; next?: string }>;
 }) {
   const { email, next } = await searchParams;
-  const safeNext = next?.startsWith("/") ? next : "/";
+  const safeNext = safeRedirectPath(next);
 
   return (
     <AuthShell

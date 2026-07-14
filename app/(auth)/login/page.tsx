@@ -4,6 +4,7 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { GoogleButton } from "@/components/auth/google-button";
+import { safeRedirectPath } from "@/lib/validation/redirect";
 import { LoginForm } from "./login-form";
 
 export const metadata = { title: "Log in · Tracxo" };
@@ -14,7 +15,7 @@ export default async function LoginPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const { next } = await searchParams;
-  const safeNext = next?.startsWith("/") ? next : "/";
+  const safeNext = safeRedirectPath(next);
 
   return (
     <AuthShell

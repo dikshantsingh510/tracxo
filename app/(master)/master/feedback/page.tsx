@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { requireMaster } from "@/lib/auth/server";
 import { formatDate, formatDateTime } from "@/lib/dates";
 import { type FeedbackStatus, type FeedbackType, listFeedback } from "@/lib/queries/feedback";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ export default async function MasterFeedbackPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
+  await requireMaster();
   const { status } = await searchParams;
   const filter =
     status && (STATUSES as string[]).includes(status) ? (status as FeedbackStatus) : undefined;

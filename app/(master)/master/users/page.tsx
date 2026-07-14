@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 
+import { requireMaster } from "@/lib/auth/server";
 import { listAllUsers } from "@/lib/queries/master";
 import { UsersTable } from "./users-table";
 
 export const metadata: Metadata = { title: "Master · Users" };
 
 export default async function MasterUsersPage() {
+  await requireMaster();
   const rows = await listAllUsers(50);
   return (
     <div className="space-y-5">

@@ -2,6 +2,7 @@ import { Archive, Building2, Receipt, Trash2, Users2, Wallet } from "lucide-reac
 import type { LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 
+import { requireMaster } from "@/lib/auth/server";
 import { getMasterStats } from "@/lib/queries/master";
 
 export const metadata: Metadata = { title: "Master · Stats" };
@@ -41,6 +42,10 @@ function Stat({
 }
 
 export default async function MasterHomePage() {
+  // Defense in depth: the (master) layout also gates on role, but layouts
+  // don't re-render on soft navigation — every page re-verifies itself
+  // (contract documented in lib/queries/master.ts).
+  await requireMaster();
   const s = await getMasterStats();
   return (
     <div className="space-y-6">

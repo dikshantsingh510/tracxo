@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 
+import { requireMaster } from "@/lib/auth/server";
 import { listAllWorkspaces } from "@/lib/queries/master";
 import { WorkspacesTable } from "./workspaces-table";
 
 export const metadata: Metadata = { title: "Master · Workspaces" };
 
 export default async function MasterWorkspacesPage() {
+  await requireMaster();
   const rows = await listAllWorkspaces(50);
   return (
     <div className="space-y-5">

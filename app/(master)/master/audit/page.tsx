@@ -2,12 +2,14 @@ import { ScrollText } from "lucide-react";
 import type { Metadata } from "next";
 
 import { EmptyState } from "@/components/ui/empty-state";
+import { requireMaster } from "@/lib/auth/server";
 import { listMasterAudit } from "@/lib/queries/master";
 import { AuditTable } from "./audit-table";
 
 export const metadata: Metadata = { title: "Master · Audit" };
 
 export default async function MasterAuditPage() {
+  await requireMaster();
   const rows = await listMasterAudit(100);
   return (
     <div className="space-y-5">

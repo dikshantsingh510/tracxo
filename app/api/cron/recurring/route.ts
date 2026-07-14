@@ -1,3 +1,5 @@
+import { timingSafeEqual } from "node:crypto";
+
 import { runRecurringExpenses } from "@/lib/recurring/runner";
 import { NextResponse } from "next/server";
 
@@ -17,7 +19,13 @@ function isAuthorized(req: Request): boolean {
   const secret = process.env.CRON_SECRET;
   if (!secret) return false;
   const header = req.headers.get("authorization");
-  return header === `Bearer ${secret}`;
+  if (!header) return false;
+  // timingSafeEqual instead of === : string comparison short-circuits on the
+  // first differing byte, leaking prefix length via response timing.
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const provided = Buffer.from(header);
+  if (expected.length !== provided.length) return false;
+  return timingSafeEqual(expected, provided);
 }
 
 async function handle(req: Request) {

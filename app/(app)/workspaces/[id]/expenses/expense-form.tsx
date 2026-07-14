@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createExpense, updateExpense } from "@/lib/actions/expenses";
+import { todayIsoDate } from "@/lib/dates";
 import { currencyCodeEnum } from "@/lib/db/schema/auth";
 import { minorToDecimalString, parseAmountMinor } from "@/lib/money";
 import type { SplitInput } from "@/lib/validation/expense";
@@ -67,9 +68,7 @@ export function ExpenseForm(
   );
   const [currency, setCurrency] = useState(initial?.currency ?? props.workspaceCurrency);
   const [paidBy, setPaidBy] = useState(initial?.paidBy ?? props.actorUserId);
-  const [expenseDate, setExpenseDate] = useState(
-    initial?.expenseDate ?? new Date().toISOString().slice(0, 10),
-  );
+  const [expenseDate, setExpenseDate] = useState(initial?.expenseDate ?? todayIsoDate());
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
   const [notes, setNotes] = useState(initial?.notes ?? "");
   const [splitMode, setSplitMode] = useState<Mode>(initial?.splitMode ?? "equal");

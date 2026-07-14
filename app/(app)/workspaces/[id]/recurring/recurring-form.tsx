@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createRecurring } from "@/lib/actions/recurring";
+import { todayIsoDate } from "@/lib/dates";
 import { currencyCodeEnum } from "@/lib/db/schema/auth";
 import { parseAmountMinor } from "@/lib/money";
 
@@ -44,7 +45,7 @@ export function RecurringForm({
   categories: Category[];
 }) {
   const router = useRouter();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIsoDate();
 
   const [description, setDescription] = useState("");
   const [amountStr, setAmountStr] = useState("");

@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createSettlement } from "@/lib/actions/settlements";
+import { todayIsoDate } from "@/lib/dates";
 import { currencyCodeEnum } from "@/lib/db/schema/auth";
 import { minorToDecimalString, parseAmountMinor } from "@/lib/money";
 import { buildUpiDeepLink, isValidVpa } from "@/lib/upi";
@@ -48,7 +49,7 @@ export function SettlementForm({
   const [currency, setCurrency] = useState(preset.currency || workspaceCurrency);
   const [method, setMethod] = useState<Method>("upi");
   const [note, setNote] = useState("");
-  const [settledAt, setSettledAt] = useState(new Date().toISOString().slice(0, 10));
+  const [settledAt, setSettledAt] = useState(todayIsoDate());
   const [submitting, setSubmitting] = useState(false);
 
   const recipient = useMemo(() => members.find((m) => m.userId === toUserId), [members, toUserId]);

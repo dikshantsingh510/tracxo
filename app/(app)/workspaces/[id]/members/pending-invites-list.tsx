@@ -12,14 +12,13 @@ import { RoleBadge } from "@/components/ui/role-badge";
 import { revokeInvitation } from "@/lib/actions/members";
 import type { PendingInvitation } from "@/lib/queries/members";
 
-// Date crosses the Server→Client boundary as an ISO string (Next 16 / React 19
-// serialization), so the typed `Date` may actually be a string at runtime.
-function formatExpiry(d: Date | string): {
+// `daysLeft` is computed server-side (members/page.tsx) and serialized across
+// the boundary, so hydration reuses the exact server value — calling
+// Date.now() here during render would mismatch SSR output.
+function formatExpiry(days: number): {
   text: string;
   variant: "neutral" | "warning" | "danger";
 } {
-  const ts = typeof d === "string" ? new Date(d).getTime() : d.getTime();
-  const days = Math.ceil((ts - Date.now()) / (1000 * 60 * 60 * 24));
   if (days <= 0) return { text: "expired", variant: "danger" };
   if (days === 1) return { text: "1 day left", variant: "warning" };
   if (days <= 3) return { text: `${days} days left`, variant: "warning" };
@@ -31,7 +30,7 @@ export function PendingInvitesList({
   invitations,
 }: {
   workspaceId: string;
-  invitations: PendingInvitation[];
+  invitations: (PendingInvitation & { daysLeft: number })[];
 }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -62,7 +61,7 @@ export function PendingInvitesList({
     <>
       <ul className="surface-acrylic-light divide-y divide-border overflow-hidden rounded-2xl">
         {invitations.map((inv) => {
-          const expiry = formatExpiry(inv.expiresAt);
+          const expiry = formatExpiry(inv.daysLeft);
           const busy = busyId === inv.id;
           return (
             <li

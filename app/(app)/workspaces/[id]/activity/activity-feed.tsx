@@ -1,6 +1,7 @@
 "use client";
 
 import { type ActivityForFormat, formatActivity } from "@/lib/activity/format";
+import { formatDateTime, timeAgo } from "@/lib/dates";
 import { useEffect, useRef, useState } from "react";
 
 type FeedRow = ActivityForFormat & {
@@ -11,18 +12,6 @@ type FeedRow = ActivityForFormat & {
   // Server passes Date → ISO string across the boundary.
   createdAt: string;
 };
-
-function timeAgo(iso: string, now: number): string {
-  const ms = now - new Date(iso).getTime();
-  if (ms < 60_000) return "just now";
-  const mins = Math.floor(ms / 60_000);
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString();
-}
 
 export function ActivityFeed({
   workspaceId,
@@ -35,10 +24,13 @@ export function ActivityFeed({
   const [connected, setConnected] = useState(false);
   const seen = useRef(new Set(initial.map((r) => r.id)));
   // Re-render once a minute so relative timestamps stay fresh without a
-  // ticker per row.
-  const [now, setNow] = useState(() => Date.now());
+  // ticker per row. Starts null so SSR and first client render agree
+  // (Date.now() in render = hydration mismatch); absolute times show until
+  // mount, then upgrade to relative.
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
+    setNow(Date.now());
     const tick = setInterval(() => setNow(Date.now()), 60_000);
     return () => clearInterval(tick);
   }, []);
@@ -91,7 +83,7 @@ export function ActivityFeed({
                 {formatActivity(r)}
               </div>
               <div className="mt-0.5 text-neutral-500 text-xs dark:text-neutral-400">
-                {timeAgo(r.createdAt, now)}
+                {now === null ? formatDateTime(r.createdAt) : timeAgo(r.createdAt, now)}
               </div>
             </li>
           ))}

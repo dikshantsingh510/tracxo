@@ -4,6 +4,7 @@ import { Bell, CircleCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { RelativeTime } from "@/components/shared/relative-time";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,18 +27,6 @@ export type BellItem = {
   readAt: string | null;
   createdAt: string;
 };
-
-function timeAgo(iso: string): string {
-  const ms = Date.now() - new Date(iso).getTime();
-  if (ms < 60_000) return "just now";
-  const mins = Math.floor(ms / 60_000);
-  if (mins < 60) return `${mins}m`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h`;
-  const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days}d`;
-  return new Date(iso).toLocaleDateString();
-}
 
 export function NotificationBell({
   unread,
@@ -126,7 +115,7 @@ export function NotificationBell({
                       </div>
                     ) : null}
                     <div className="mt-1 text-muted-foreground text-xs">
-                      {timeAgo(it.createdAt)}
+                      <RelativeTime iso={it.createdAt} />
                     </div>
                   </div>
                 </div>

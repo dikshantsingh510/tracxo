@@ -2,16 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { type Column, DataTable } from "@/components/ui/data-table";
+import { formatDateTime } from "@/lib/dates";
 import type { MasterAuditRow } from "@/lib/queries/master";
-
-function fmtDateTime(d: Date) {
-  return new Date(d).toLocaleString("en-IN", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 const columns: Column<MasterAuditRow>[] = [
   {
@@ -19,7 +11,7 @@ const columns: Column<MasterAuditRow>[] = [
     header: "When",
     render: (r) => (
       <span className="whitespace-nowrap text-muted-foreground text-xs">
-        {fmtDateTime(r.createdAt)}
+        {formatDateTime(r.createdAt)}
       </span>
     ),
   },

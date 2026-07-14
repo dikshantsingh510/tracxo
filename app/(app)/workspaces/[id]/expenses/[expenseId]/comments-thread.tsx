@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { createComment, deleteComment } from "@/lib/actions/comments";
+import { formatDateTime } from "@/lib/dates";
 import type { CommentRow } from "@/lib/queries/comments";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -64,7 +65,7 @@ export function CommentsThread({
                   {c.authorName ?? "Removed user"}
                 </span>
                 <span className="text-neutral-500 dark:text-neutral-400">
-                  {new Date(c.createdAt).toLocaleString()}
+                  {formatDateTime(c.createdAt)}
                 </span>
               </div>
               <p className="mt-1.5 whitespace-pre-wrap text-neutral-900 text-sm dark:text-neutral-50">

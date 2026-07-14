@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { formatDate, formatDateTime } from "@/lib/dates";
 import { type FeedbackStatus, type FeedbackType, listFeedback } from "@/lib/queries/feedback";
 import { cn } from "@/lib/utils";
 import { FeedbackStatusSelect } from "./feedback-status-select";
@@ -18,15 +19,6 @@ const TYPE_VARIANT: Record<FeedbackType, "danger" | "info" | "neutral" | "succes
   general: "neutral",
   praise: "success",
 };
-
-function fmtDateTime(d: Date) {
-  return new Date(d).toLocaleString("en-IN", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 export default async function MasterFeedbackPage({
   searchParams,
@@ -87,7 +79,7 @@ export default async function MasterFeedbackPage({
                   {r.submitterEmail ? ` · ${r.submitterEmail}` : ""}
                 </span>
                 <span className="text-muted-foreground/50">·</span>
-                <span className="text-muted-foreground">{fmtDateTime(r.createdAt)}</span>
+                <span className="text-muted-foreground">{formatDateTime(r.createdAt)}</span>
               </div>
               <p className="mt-2 whitespace-pre-wrap text-foreground text-sm">{r.message}</p>
               {r.pageUrl || r.userAgent ? (
@@ -100,7 +92,7 @@ export default async function MasterFeedbackPage({
                 <FeedbackStatusSelect id={r.id} status={r.status} />
                 {r.resolvedAt ? (
                   <span className="text-muted-foreground text-xs">
-                    closed {new Date(r.resolvedAt).toLocaleDateString("en-IN")}
+                    closed {formatDate(r.resolvedAt)}
                   </span>
                 ) : null}
               </div>

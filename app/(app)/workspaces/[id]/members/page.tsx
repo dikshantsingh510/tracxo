@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireSession } from "@/lib/auth/server";
+import { daysUntil } from "@/lib/dates";
 import { getPendingInvitations, getWorkspaceMembers } from "@/lib/queries/members";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
 import { InviteForm } from "./invite-form";
@@ -19,10 +20,14 @@ export default async function MembersPage({ params }: { params: Promise<{ id: st
 
   const canManage = workspace.role === "owner" || workspace.role === "admin";
 
-  const [members, pending] = await Promise.all([
+  const [members, pendingRaw] = await Promise.all([
     getWorkspaceMembers(workspace.id),
     canManage ? getPendingInvitations(workspace.id) : Promise.resolve([]),
   ]);
+  // Expiry is computed here (server) so the client list renders a serialized
+  // value instead of calling Date.now() mid-render (hydration mismatch).
+  const now = Date.now();
+  const pending = pendingRaw.map((inv) => ({ ...inv, daysLeft: daysUntil(inv.expiresAt, now) }));
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6">

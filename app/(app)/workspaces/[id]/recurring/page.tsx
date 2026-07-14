@@ -7,20 +7,13 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Money } from "@/components/ui/money";
 import { requireSession } from "@/lib/auth/server";
+import { formatDate } from "@/lib/dates";
 import { listRecurring } from "@/lib/queries/recurring";
 import { getWorkspaceById } from "@/lib/queries/workspaces";
 import { humanizeRRule } from "@/lib/recurring/rrule";
 import { RecurringActions } from "./recurring-actions";
 
 export const metadata = { title: "Recurring · Tracxo" };
-
-function fmtDate(d: Date) {
-  return new Date(d).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export default async function RecurringPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -82,8 +75,8 @@ export default async function RecurringPage({ params }: { params: Promise<{ id: 
                   {humanizeRRule(r.rrule)} · {r.payerName} pays
                 </div>
                 <div className="truncate text-muted-foreground text-xs">
-                  Next {fmtDate(r.nextRunAt)}
-                  {r.lastRunAt ? ` · last ${fmtDate(r.lastRunAt)}` : ""}
+                  Next {formatDate(r.nextRunAt)}
+                  {r.lastRunAt ? ` · last ${formatDate(r.lastRunAt)}` : ""}
                 </div>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-2">

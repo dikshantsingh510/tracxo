@@ -3,19 +3,12 @@
 import { Badge } from "@/components/ui/badge";
 import { type Column, DataTable } from "@/components/ui/data-table";
 import { RoleBadge } from "@/components/ui/role-badge";
+import { formatDate } from "@/lib/dates";
 import type { MasterUserRow } from "@/lib/queries/master";
 
 // `role` here is RoleBadge's domain prop, not an ARIA role — referenced via a
 // const so biome's useValidAriaRole doesn't treat the literal as an ARIA role.
 const MASTER = "master" as const;
-
-function fmtDate(d: Date) {
-  return new Date(d).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 const columns: Column<MasterUserRow>[] = [
   {
@@ -63,7 +56,7 @@ const columns: Column<MasterUserRow>[] = [
     key: "joined",
     header: "Joined",
     align: "right",
-    render: (u) => <span className="text-muted-foreground text-xs">{fmtDate(u.createdAt)}</span>,
+    render: (u) => <span className="text-muted-foreground text-xs">{formatDate(u.createdAt)}</span>,
   },
 ];
 
